@@ -226,15 +226,6 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		////Obteniendo el tiempo actual
-		//float actualTime = glfwGetTime();
-		////Duracion de la animacion
-		//float radio = 5.0f;
-		//float speed = 1.0f;
-
-		//float posX = cos(actualTime * speed) * radio;
-		//float posZ = sin(actualTime * speed) * radio;
-
 		float rotFlores = 45.0f;
 
 
@@ -332,7 +323,7 @@ int main()
 		//birdWL.Draw(lightingShader);
 
 		glm::vec3 centroPajaro = glm::vec3(0.0f, 2.0f, 0.0f);
-		float radio = 5.0f;
+		float radio = 3.0f;
 		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
 
 		////Se dibuja el cesped
@@ -700,14 +691,16 @@ void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc) {
 void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Model& wingL, float tiempo, glm::vec3 centro, float radio)
 {
 	float speed = 1.0f; // Velocidad de órbita
-
+	float speedWings = 3.0f;
+	float amplWings = 2.0f;
 	// Cálculo de la posición (Trayectoria Circular)
 	float posX = cos(tiempo * speed) * radio;
 	float posZ = sin(tiempo * speed) * radio;
 
 	// Calculamos el ángulo de rotación para que el pájaro mire al frente mientras gira
 	float rotacionY = -tiempo * speed;
-
+	//Calcula el ángulo del aleteo de las altas
+	float angleWings = sin(tiempo * speedWings) * amplWings;
 	// Matriz base (Padre)
 	glm::mat4 model = glm::mat4(1.0f);
 
@@ -722,14 +715,16 @@ void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Mod
 	body.Draw(shader);
 
 	// 3. Dibujar las alas (Jerarquía Hijos)
-	// Usamos la misma matriz 'model' para que las alas se muevan y roten con el cuerpo.
-	// Si quisieras aleteo, aquí aplicarías rotaciones adicionales sobre 'model'.
-
+	
 	// Ala Derecha
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glm::mat4 modelWingR = model;
+	modelWingR = glm::rotate(modelWingR, glm::radians(angleWings), glm::vec3(0.0f, 0.0f, 1.0f));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelWingR));
 	wingR.Draw(shader);
 
 	// Ala Izquierda
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glm::mat4 modelWingL = model;
+	modelWingL = glm::rotate(modelWingL, glm::radians(-angleWings), glm::vec3(0.0f, 0.0f, 1.0f));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelWingL));
 	wingL.Draw(shader);
 }
