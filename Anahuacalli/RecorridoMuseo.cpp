@@ -28,8 +28,15 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
-void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc);
+// Funciones creadas
+//Dibuja las ventanas de diferentes edificios.
+void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc); 
+//Animación por Keyframes de un pajaro volando
 void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Model& wingL, float tiempo, glm::vec3 centro, float radio);
+// Dibuja un objeto compuesto por dos partes (ej. tronco y hojas)
+void DibujarArbol(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala);
+// Dibuja el modelo de flores con su rotación específica
+void DibujarFlor(Shader& shader, GLint modelLoc, Model& modeloFlor, glm::vec3 posicion, float escala, float angulo);
 // Window dimensions
 const GLuint WIDTH = 1200, HEIGHT = 800;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
@@ -307,24 +314,17 @@ int main()
 		glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
-		//Pajaro o abeja animado
-		//model = glm::mat4(1);
-		//model = glm::translate(model, glm::vec3(posX, 0.0f, posZ));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//birdB.Draw(lightingShader);
-		//// Alas del pajaro
-		//// Derecha
-		//modelTemp = model;
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//birdWR.Draw(lightingShader);
-		////izquierda
-		//modelTemp = model;
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//birdWL.Draw(lightingShader);
-
 		glm::vec3 centroPajaro = glm::vec3(0.0f, 2.0f, 0.0f);
 		float radio = 3.0f;
 		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
+
+		DibujarArbol(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -30.0f), 0.5);
+		DibujarArbol(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -40.0f), 0.5);
+		DibujarArbol(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -50.0f), 0.5);
+
+		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(30.0f, 0.5f, -16.0f), 0.5f, 90.0f);
+		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(15.0f, 0.5f, -4.0f), 0.5f, 90.0f);
+		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(-3.0f, 0.5f, -4.0f), 0.5f, 90.0f);
 
 		////Se dibuja el cesped
 		//model = glm::mat4(1);
@@ -336,36 +336,7 @@ int main()
 		//Cesped.Draw(lightingShader);
 		////glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		//glBindVertexArray(0);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(40.0f, 0.0f, -30.0f));
-		model = glm::scale(model, glm::vec3(0.5f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		pinoL.Draw(lightingShader);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(40.0f, 0.0f, -30.0f));
-		model = glm::scale(model, glm::vec3(0.5f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		pinoB.Draw(lightingShader);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(40.0f, 0.0f, -40.0f));
-		model = glm::scale(model, glm::vec3(0.5f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		pinoL.Draw(lightingShader);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(40.0f, 0.0f, -40.0f));
-		model = glm::scale(model, glm::vec3(0.5f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		pinoB.Draw(lightingShader);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(40.0f, 0.0f, -50.0f));
-		model = glm::scale(model, glm::vec3(0.5f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		pinoL.Draw(lightingShader);
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(40.0f, 0.0f, -50.0f));
-		model = glm::scale(model, glm::vec3(0.5f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		pinoB.Draw(lightingShader);
+		
 
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(30.0f, -5.0f, -70.0f));
@@ -376,30 +347,6 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		treeL.Draw(lightingShader);
 		
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(30.0f, 0.5f, -16.0f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.5));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		flores.Draw(lightingShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(15.0f, 0.5f, -4.0f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.5));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		flores.Draw(lightingShader);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-3.0f, 0.5f, -4.0f));
-		model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.5));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		flores.Draw(lightingShader);
-
-
-
-
 		//Se dibuja el patio central
 		model = glm::mat4(1);
 		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
@@ -727,4 +674,24 @@ void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Mod
 	modelWingL = glm::rotate(modelWingL, glm::radians(-angleWings), glm::vec3(0.0f, 0.0f, 1.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelWingL));
 	wingL.Draw(shader);
+}
+
+void DibujarArbol(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala)
+{
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(posicion));
+	model = glm::scale(model, glm::vec3(escala));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	tronco.Draw(shader);
+	hojas.Draw(shader);
+}
+
+void DibujarFlor(Shader& shader, GLint modelLoc, Model& modeloFlor, glm::vec3 posicion, float escala, float angulo) 
+{
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(posicion));
+	model = glm::rotate(model, glm::radians(angulo), glm::vec3(0.0f, 1.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(escala));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	modeloFlor.Draw(shader);
 }
