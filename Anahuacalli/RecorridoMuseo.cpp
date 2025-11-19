@@ -33,8 +33,13 @@ void DoMovement();
 void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc); 
 //Animación por Keyframes de un pajaro volando
 void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Model& wingL, float tiempo, glm::vec3 centro, float radio);
+// Animacion Keyframes de un quetzal
+void AnimarQuetzal(Shader& shader, GLint modelLoc, Model& body, Model& head, Model& tail, glm::vec3 posicion, bool animar, float time);
+
 // Dibuja un objeto compuesto por dos partes (ej. tronco y hojas)
-void DibujarArbol(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala);
+void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala);
+// Dibuja un solo arbol
+void DibujarArbol(Shader& shader, GLint modelLoc, Model& arbol, Model& hoja, glm::vec3 posicion, float angulo);
 // Dibuja el modelo de flores con su rotación específica
 void DibujarFlor(Shader& shader, GLint modelLoc, Model& modeloFlor, glm::vec3 posicion, float escala, float angulo);
 // Window dimensions
@@ -198,10 +203,14 @@ int main()
 	Model tree((char*)"Models/aviarioarbol.obj");
 	Model treeL((char*)"Models/hojasaviario.obj");
 	//Modelos animados
+	//Pajaro
 	Model birdB((char*)"Models/pajaro1body.obj");
 	Model birdWR((char*)"Models/pajaro1der.obj");
 	Model birdWL((char*)"Models/pajaro1izq.obj");
-
+	//Quetzal
+	Model quetzalB((char*)"Models/pajaro2body.obj");
+	Model quetzalH((char*)"Models/pajaro2head.obj");
+	Model quetzalT((char*)"Models/pajaro2tail.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -314,17 +323,63 @@ int main()
 		glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
-		glm::vec3 centroPajaro = glm::vec3(0.0f, 2.0f, 0.0f);
-		float radio = 3.0f;
+		glm::vec3 centroPajaro = glm::vec3(20.0f, 2.0f, -10.0f);
+		float radio = 2.0f;
+		glm::vec3 posicionQ = glm::vec3(17.0f, -3.0f, -62.0f);
+		
 		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
+		AnimarQuetzal(lightingShader, modelLoc, quetzalB, quetzalH, quetzalT, posicionQ, true,currentFrame);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -30.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -40.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -50.0f), 0.5);
+		//Cubriendo areas verdes costadod derecho entrada
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -5.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -5.0f), 0.5);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -15.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -15.0f), 0.5);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -25.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -25.0f), 0.5);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -35.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -35.0f), 0.5);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -45.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -45.0f), 0.5);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -55.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -55.0f), 0.5);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -65.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -65.0f), 0.5);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -75.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -75.0f), 0.5);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -85.0f), 0.5);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -85.0f), 0.5);
+		
 
-		DibujarArbol(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -30.0f), 0.5);
-		DibujarArbol(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -40.0f), 0.5);
-		DibujarArbol(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -50.0f), 0.5);
+		//Cubriendo areas verdes costado izquierdo museo
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(10.0f, 0, -17.0f), 1.0);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(0.0f, 0, -17.0f), 1.0);
+		
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(10.0f, 0, -27.0f), 1.0);
+		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(0.0f, 0, -27.0f), 1.0);
+
+		DibujarArbol(lightingShader, modelLoc, tree, treeL, glm::vec3(30.0f, -5.0f, -70.0f),0.0f);
+		DibujarArbol(lightingShader, modelLoc, tree, treeL, glm::vec3(20.0f, -5.0f, -95.0f), 90.0f);
+
+		
+		
+
 
 		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(30.0f, 0.5f, -16.0f), 0.5f, 90.0f);
 		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(15.0f, 0.5f, -4.0f), 0.5f, 90.0f);
 		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(-3.0f, 0.5f, -4.0f), 0.5f, 90.0f);
+
+		
 
 		////Se dibuja el cesped
 		//model = glm::mat4(1);
@@ -338,7 +393,7 @@ int main()
 		//glBindVertexArray(0);
 		
 
-		model = glm::mat4(1.0f);
+		/*model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(30.0f, -5.0f, -70.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		tree.Draw(lightingShader);
@@ -346,7 +401,7 @@ int main()
 		model = glm::translate(model, glm::vec3(30.0f, -5.0f, -70.0f));
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		treeL.Draw(lightingShader);
-		
+		*/
 		//Se dibuja el patio central
 		model = glm::mat4(1);
 		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
@@ -552,6 +607,19 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	}
 
+	if (key == GLFW_KEY_P && action == GLFW_PRESS)
+	{
+		// Obtiene la posición actual de la cámara
+		glm::vec3 pos = camera.GetPosition();
+
+		// Imprime en formato listo para copiar y pegar (ej: 10.5f, 2.0f, -5.0f)
+		std::cout << "\nCOORDENADAS CAPTURADAS: " << std::endl;
+		std::cout << "glm::vec3(" << pos.x << "f, " << pos.y << "f, " << pos.z << "f)" << std::endl;
+
+		// Opcional: Imprimir también la dirección hacia donde miras (Yaw/Pitch)
+		// por si necesitas rotar el objeto.
+	}
+
 	if (key >= 0 && key < 1024)
 	{
 		if (action == GLFW_PRESS)
@@ -646,24 +714,15 @@ void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Mod
 
 	// Calculamos el ángulo de rotación para que el pájaro mire al frente mientras gira
 	float rotacionY = -tiempo * speed;
-	//Calcula el ángulo del aleteo de las altas
+	//Calcula el ángulo del aleteo de las alas
 	float angleWings = sin(tiempo * speedWings) * amplWings;
 	// Matriz base (Padre)
 	glm::mat4 model = glm::mat4(1.0f);
-
-	// Trasladar al centro + la posición orbital
 	model = glm::translate(model, centro + glm::vec3(posX, 0.0f, posZ));
-
-	// Rotar para que mire hacia la dirección del movimiento
 	model = glm::rotate(model, rotacionY, glm::vec3(0.0f, 1.0f, 0.0f));
-
-	// Enviar matriz y dibujar Cuerpo
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	body.Draw(shader);
-
-	// 3. Dibujar las alas (Jerarquía Hijos)
-	
-	// Ala Derecha
+	// Ala derecha
 	glm::mat4 modelWingR = model;
 	modelWingR = glm::rotate(modelWingR, glm::radians(angleWings), glm::vec3(0.0f, 0.0f, 1.0f));
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelWingR));
@@ -676,7 +735,58 @@ void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Mod
 	wingL.Draw(shader);
 }
 
-void DibujarArbol(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala)
+void AnimarQuetzal(Shader& shader, GLint modelLoc, Model& body, Model& head, Model& tail, glm::vec3 posicion, bool animar, float time)
+{
+	// tiempos para cada rotación
+	//				  [0.0s  0.5s    1.0s  1.5s   2.0s]
+	float keyBody[] = { 0.0f, 2.0f, 0.0f, -2.0f, 0.0f };
+	float keyTail[] = { 0.0f, 1.5f, 0.0f, -1.5f, 0.0f };
+
+	// Inicalización de angulos
+	float angleBody = 0.0f;
+	float angleTail = 0.0f;
+	//Interpolacion
+	if (animar)
+	{
+		//duracion del ciclo
+		float cycle = 4.0f;
+		// Tiempo del ciclo entre 0 y cycle
+		float actualTime = fmod(time, cycle);
+
+		int indexActual = (int)actualTime;
+		int indexNext = (indexActual + 1) % 5;
+		//Calculo del avance entre el siguiente frame y el actual
+		float factor = actualTime - (float)indexActual;
+		// Interpolación con glm::mix
+		angleBody = glm::mix(keyBody[indexActual], keyBody[indexNext], factor);
+		angleTail = glm::mix(keyTail[indexActual], keyTail[indexNext], factor);
+	}
+	else
+	{
+		// En caso de no estar activa la animacion
+		angleBody = 0.0f;
+		angleTail = 0.0f;
+	}
+
+	// Matriz padre: cuerpo
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, posicion);
+	model = glm::rotate(model, glm::radians(angleBody), glm::vec3(1.0f, 0.0f, 0.0f));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	body.Draw(shader);
+	// Cabeza
+	glm::mat4 modelHead = model;
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelHead));
+	head.Draw(shader);
+	// Cola
+	glm::mat4 modelTail = model;
+	modelTail = glm::rotate(modelTail, glm::radians(angleTail), glm::vec3(0.0f, 0.0f, -1.0f));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTail));
+	tail.Draw(shader);
+}
+
+
+void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala)
 {
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(posicion));
@@ -684,6 +794,15 @@ void DibujarArbol(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, g
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	tronco.Draw(shader);
 	hojas.Draw(shader);
+}
+void DibujarArbol(Shader& shader, GLint modelLoc, Model& arbol, Model& hoja, glm::vec3 posicion, float angulo)
+{
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(posicion));
+	model = glm::rotate(model, glm::radians(angulo), glm::vec3(0.0f, 1.0f, 0.0f));
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	arbol.Draw(shader);
+	hoja.Draw(shader);
 }
 
 void DibujarFlor(Shader& shader, GLint modelLoc, Model& modeloFlor, glm::vec3 posicion, float escala, float angulo) 
