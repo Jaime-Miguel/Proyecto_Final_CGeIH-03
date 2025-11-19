@@ -28,7 +28,8 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
-
+void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc);
+void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Model& wingL, float tiempo, glm::vec3 centro, float radio);
 // Window dimensions
 const GLuint WIDTH = 1200, HEIGHT = 800;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
@@ -39,6 +40,7 @@ GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
 bool firstMouse = true;
+
 // Light attributes
 glm::vec3 lightPos(0.0f, 0.0f, 0.0f);
 bool active;
@@ -47,7 +49,7 @@ float repetir = 0.0f;
 
 glm::vec3 centro = glm::vec3(-16.0f, 1.0f, -16.0f);		//Centro del museo
 glm::vec3 eje_rotacion_cuadro = glm::vec3(1.0f, 0.0f, 0.0f);
-
+glm::mat4 modelTemp(1.0f);
 // Positions of the point lights
 glm::vec3 pointLightPositions[] = {
 	glm::vec3(-15.0f,4.0f, 8.5f),
@@ -168,6 +170,12 @@ int main()
 	Shader lightingShader("Shader/lighting.vs", "Shader/lighting.frag");
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 
+	Model vidrios[] = {
+		Model((char*)"Models/Cristal1.obj"),
+		Model((char*)"Models/Cristal2.obj"),
+		Model((char*)"Models/Cristal3.obj")
+	};
+
 	Model Ball((char*)"Models/ball.obj");
 	Model Patio_Principal((char*)"Models/Patio_Principal.obj");
 	Model Cesped((char*)"Models/Cesped.obj");
@@ -183,7 +191,9 @@ int main()
 	Model tree((char*)"Models/aviarioarbol.obj");
 	Model treeL((char*)"Models/hojasaviario.obj");
 	//Modelos animados
-	
+	Model birdB((char*)"Models/pajaro1body.obj");
+	Model birdWR((char*)"Models/pajaro1der.obj");
+	Model birdWL((char*)"Models/pajaro1izq.obj");
 
 
 	// First, set the container's VAO (and VBO)
@@ -216,14 +226,14 @@ int main()
 		deltaTime = currentFrame - lastFrame;
 		lastFrame = currentFrame;
 
-		//Obteniendo el tiempo actual
-		float actualTime = glfwGetTime();
-		//Duracion de la animacion
-		float radio = 5.0f;
-		float speed = 1.0f;
+		////Obteniendo el tiempo actual
+		//float actualTime = glfwGetTime();
+		////Duracion de la animacion
+		//float radio = 5.0f;
+		//float speed = 1.0f;
 
-		float posX = cos(actualTime * speed) * radio;
-		float posZ = sin(actualTime * speed) * radio;
+		//float posX = cos(actualTime * speed) * radio;
+		//float posZ = sin(actualTime * speed) * radio;
 
 		float rotFlores = 45.0f;
 
@@ -307,6 +317,23 @@ int main()
 		glBindVertexArray(0);
 
 		//Pajaro o abeja animado
+		//model = glm::mat4(1);
+		//model = glm::translate(model, glm::vec3(posX, 0.0f, posZ));
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//birdB.Draw(lightingShader);
+		//// Alas del pajaro
+		//// Derecha
+		//modelTemp = model;
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//birdWR.Draw(lightingShader);
+		////izquierda
+		//modelTemp = model;
+		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		//birdWL.Draw(lightingShader);
+
+		glm::vec3 centroPajaro = glm::vec3(0.0f, 2.0f, 0.0f);
+		float radio = 5.0f;
+		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
 
 		////Se dibuja el cesped
 		//model = glm::mat4(1);
@@ -444,6 +471,8 @@ int main()
 		Cuadro04.Draw(lightingShader);
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
+
+		Dibujar_Vidrios(lightingShader, vidrios, modelLoc);
 
 		// Se dibuja el cuadro mas grande del museo
 		model = glm::mat4(1);
@@ -627,4 +656,80 @@ void MouseCallback(GLFWwindow* window, double xPos, double yPos)
 	lastY = yPos;
 
 	camera.ProcessMouseMovement(xOffset, yOffset);
+}
+
+void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc) {
+	// Dibuja el Vidrio para las ventanas
+	glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
+
+	glm::mat4 model = glm::mat4(1);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform1i(glGetUniformLocation(shader.Program, "transparency"), 1);
+	vidrios[0].Draw(shader);
+	glBindVertexArray(0);
+
+	// Dibuja el Vidrio para las ventanas
+	model = glm::mat4(1);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform1i(glGetUniformLocation(shader.Program, "transparency"), 1);
+	vidrios[1].Draw(shader);
+	glBindVertexArray(0);
+
+	// Dibuja el Vidrio para las ventanas
+	model = glm::mat4(1);
+	model = glm::translate(model, glm::vec3(-16.0f, 0.0f, 0.0f));
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform1i(glGetUniformLocation(shader.Program, "transparency"), 1);
+	vidrios[1].Draw(shader);
+	glBindVertexArray(0);
+
+	// Dibuja el Vidrio para las ventanas
+	model = glm::mat4(1);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	glUniform1i(glGetUniformLocation(shader.Program, "transparency"), 1);
+	vidrios[2].Draw(shader);
+	glBindVertexArray(0);
+
+	glDisable(GL_BLEND);  //Desactiva el canal alfa 
+}
+
+void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Model& wingL, float tiempo, glm::vec3 centro, float radio)
+{
+	float speed = 1.0f; // Velocidad de órbita
+
+	// Cálculo de la posición (Trayectoria Circular)
+	float posX = cos(tiempo * speed) * radio;
+	float posZ = sin(tiempo * speed) * radio;
+
+	// Calculamos el ángulo de rotación para que el pájaro mire al frente mientras gira
+	float rotacionY = -tiempo * speed;
+
+	// Matriz base (Padre)
+	glm::mat4 model = glm::mat4(1.0f);
+
+	// Trasladar al centro + la posición orbital
+	model = glm::translate(model, centro + glm::vec3(posX, 0.0f, posZ));
+
+	// Rotar para que mire hacia la dirección del movimiento
+	model = glm::rotate(model, rotacionY, glm::vec3(0.0f, 1.0f, 0.0f));
+
+	// Enviar matriz y dibujar Cuerpo
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	body.Draw(shader);
+
+	// 3. Dibujar las alas (Jerarquía Hijos)
+	// Usamos la misma matriz 'model' para que las alas se muevan y roten con el cuerpo.
+	// Si quisieras aleteo, aquí aplicarías rotaciones adicionales sobre 'model'.
+
+	// Ala Derecha
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	wingR.Draw(shader);
+
+	// Ala Izquierda
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	wingL.Draw(shader);
 }
