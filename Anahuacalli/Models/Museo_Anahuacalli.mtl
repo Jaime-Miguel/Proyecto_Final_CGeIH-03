@@ -2111,6 +2111,66 @@ d 1.000000
 illum 2
 map_Kd Cemento.jpg
 
+newmtl Cuadro3
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd CuadroPrimerPlanta2.png
+
+newmtl Cuadro4
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd CuadroPrimeraPlanta3.png
+
+newmtl Cuadro6
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd CuadroPrimeraPlanta4.jpg
+
+newmtl Cuadro7
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd CuadroPrimeraPlanta5.jpg
+
+newmtl CuadroArte1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd CuadroPlantaBaja.png
+
+newmtl CuadroArte2
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd CuadroPrimerPlanta1.png
+
 newmtl Fondo
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
@@ -2780,6 +2840,26 @@ Ni 1.500000
 d 1.000000
 illum 2
 map_Kd Techo_barda.jpg
+
+newmtl Material.367
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ArcoEntrada.jpg
+
+newmtl Material.368
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ArcoEntrada.jpg
 
 newmtl Material.396
 Ns 0.000000
@@ -5561,6 +5641,26 @@ d 1.000000
 illum 3
 map_Kd Madera.jpg
 
+newmtl Mural1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd PrimeraPlantaMural1.png
+
+newmtl Mural2
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd PrimeraPlantaMural2.png
+
 newmtl Pared
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
@@ -5760,6 +5860,16 @@ Ni 1.500000
 d 1.000000
 illum 2
 map_Kd textura_suelo.jpg
+
+newmtl PinturaArte1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd CuadroPlantaBaja2.jpg
 
 newmtl Roca
 Ns 250.000000
@@ -6021,6 +6131,16 @@ d 1.000000
 illum 2
 map_Kd SueloSecundario.jpg
 
+newmtl Techo2
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Pintura_Techo.jpg
+
 newmtl TextoEntrada
 Ns 250.000000
 Ka 1.000000 1.000000 1.000000
@@ -6030,6 +6150,56 @@ Ni 1.500000
 d 1.000000
 illum 2
 map_Kd MensajeEntrada.jpg
+
+newmtl Vitrina1
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Vitrina1.jpg
+
+newmtl Vitrina2
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Vitrina2.jpg
+
+newmtl Vitrina3
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Vitrina3.jpg
+
+newmtl Vitrina4
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Vitrina4.jpg
+
+newmtl Vitrina5
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd Vitrina5.jpg
 
 newmtl arco
 Ns 250.000000

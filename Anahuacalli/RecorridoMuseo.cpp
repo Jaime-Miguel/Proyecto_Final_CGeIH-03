@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 
+
 // GLEW
 #include <GL/glew.h>
 
@@ -14,6 +15,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+// SFML audio
+#include <SFML/Audio.hpp>
 
 //Load Models
 #include "SOIL2/SOIL2.h"
@@ -87,13 +91,18 @@ glm::vec3 pointLightPositions[] = {
 	glm::vec3(0.0f,0.0f, 0.0f)
 };
 
-glm::vec3 posicionesCuadros[] = {
-	glm::vec3(0.0f, 2.0f, 1.0f),
-	glm::vec3(5.0f, 1.0f, 1.0f),
-	glm::vec3(8.0f, 1.0f, 1.0f),
-	glm::vec3(11.0f, 1.0f, 1.0f),
-	glm::vec3(15.0f, 1.5f, 1.0f),
-	glm::vec3(19.0f, 1.5f, 1.5f)
+glm::vec3 pos_cuadros[] = {
+	glm::vec3(-17.0f, 16.0f, -26.25f),
+	glm::vec3(-25.5f, 14.0f, -27.75f),
+	glm::vec3(-25.0f, 11.0f, -29.5f),
+	glm::vec3(-20.0f, 11.0f, -40.0f)
+};
+
+float rotaciones[] = {
+	0,
+	90.0f,
+	180.0f,
+	270.0f
 };
 
 float vertices[] = {
@@ -150,59 +159,72 @@ typedef struct {
 } FRAME_CAMERA;
 
 FRAME_CAMERA frames[] = {
-	//{ 48.0f, 2.0f, 5.0f, 270.0f, 0.0f, 0.0f},	//Entrada Principal
-	//{ 48.0f, 2.0f, -8.0f, 180.0f, 0.0f, 2.0f},	//Rotacion hacia la compra del boleto
-	//{ 20.0f, 2.0f, -8.0f, 180.0f, 0.0f, 3.0f},	//Avanza hacia la compra del boleto
-	//{ 20.0f, 2.0f, -12.0f, 270.0f, 0.0f, 2.0f}, //Avanza por el costado derecho
-	//{ 25.0f, 2.0f, -12.0f, 360.0f, 0.0f, 3.0f},	//Avanza por la orilla y gira a la derecha
-	//{ 30.0f, 2.0f, -12.0f, 270.0f, 0.0f, 3.0f},	//Avanza por la orilla y gira a la izquierda
-	//{ 30.0f, 2.0f, -46.5f, 270.0f, 0.0f, 3.0f}, //Avanzo por enfrente del museo
-	//{ 33.0f, 2.0f, -48.5f, 290.0f, 0.0f, 1.0f}, //Avanza por el primer edifico
-	//{ 33.0f, 2.0f, -50.5f, 270.0f, 0.0f, 2.0f}, //Avanza por el costado primer edifico
-	//{ 33.0f, 2.0f, -70.5f, 270.0f, 0.0f, 3.0f}, //Avanza por el costado del primer edifico
-	//{ 33.0f, 2.0f, -80.0f, 360.0f, 0.0f, 5.0f}, //Avanza mirando el centro del primer edifico
-	//{ 33.0f, 2.0f, -85.0f, 270.0f, 0.0f, 1.0f}, //Avanza retornando la mirada al pasillo principal
-	//{ 33.0f, 2.0f, -98.0f, 180.0f, 0.0f, 2.0f}, //Avanza hasta el final del pasillo y voltea al segundo edificio
-	//{ 15.0f, 2.0f, -98.0f, 180.0f, 0.0f, 3.0f}, //Avanza para el segundo edificio
-	//{ 7.0f, 2.0f, -98.0f, 270.0f, 0.0f, 5.0f},  //Avanza mirando al centro del segundo edificio
-	//{ 1.0f, 2.0f, -98.0f, 180.0f, 0.0f, 1.0f},  //Avanza retornando la vista sobre el pasillo
-	//{ -7.0f, 2.0f, -98.0f, 180.0f, 0.0f, 1.0f},  //Avanza hasta el final del segundo pasillo
-	//{ -7.0f, 2.0f, -110.0f, 225.0f, 0.0f, 2.0f},  //Observa en el mirador
-	//{ -7.0f, 2.0f, -98.0f, 135.0f, 0.0f, 2.0f},  //Observa en el mirador
-	//{ 1.0f, 2.0f, -98.0f, 0.0f, 0.0f, 2.0f},  //Retorna hacia atras
-	//{ 33.0f, 2.0f, -98.0f, 90.0f, 0.0f, 3.0f }, // Regresa por el pasillo volteando hacia la entrada
-	//{33.0f, 2.0f, -50.0f, 180.0f, 0.0f, 3.0f},  // Se acerca a la entrada
-	//{12.0f, 2.0f, -24.0f, 180.0f, 0.0f, 3.0f},	// Se posiciona en la sala izqueirda
-	//{-16.0f, 2.0f, -24.0f, 45.0f, 0.0f, 3.0f},  // Se fija por la sala de la izquierda
-	//{-16.0f, 2.0f, -24.0f, 90.0f, 0.0f, 3.0f},  // Inspecciona lo restante de la sala izquierda
-	//{-15.0f, 2.0f, -35.0, 270.0f, 0.0f, 3.0f},	// Avanza a la entrada de la sala derecha
-	//{-15.0f, 2.0f, -35.0, 180.0f, 0.0f, 3.0f},	// Inspecciona la sala empezando por la izqueirda
-	//{-15.0f, 2.0f, -35.0, 320.0f, 0.0f, 3.0f},	// Inspecciona la sala terminando por la derecha
-	//{-28.0f, 5.0f, -31.0, 180.0f, 15.0f, 3.0f}, // Sube las escaleras
-	//{-29.0, 8.0f, -17.0f, 45.0f, 15.0f, 3.0f},  // Sube las escaleras de la izquierda
-	//{-29.0, 8.0f, -17.0f, 0.0f, 0.0f, 3.0f},	// Coloca bien la vista
-	//{-17.0f, 9.0f, -22.0f, 45.0f, 0.0f, 3.0f},	// Inspecciona la sala donde esta
-	//{-17.0f, 9.0f, -22.0f, 90.0f, 0.0f, 3.0f},  // termina de inspeccionar la sala
-	{-17.0f, 9.0f, -22.0f, 270.0f, 0.0f, 3.0f}, // Se pasa a la segunda sala del segundo piso
-	{-20.0f, 9.0f, -34.0f, 320.0f, 0.0f, 3.0f}, // Insecciona la segunda sala
-	{-20.0f, 9.0f, -34.0f, 180.0f, 0.0f, 3.0f}, // Termina de inspeccionar la sala;
-	{-33.0f, 9.0f, -17.0f, 180.0f, 0.0f, 3.0f}, // Se pasa a la sala más chica
-	{-33.0f, 9.0f, -27.0f, 145.0f, 0.0f, 3.0f},  // Inspecciona la sala
+	{ 48.0f, 2.0f, 5.0f, 270.0f, 0.0f, 0.0f},	//Entrada Principal
+	{ 48.0f, 2.0f, -8.0f, 180.0f, 0.0f, 2.0f},	//Rotacion hacia la compra del boleto
+	{ 20.0f, 2.0f, -8.0f, 180.0f, 0.0f, 3.0f},	//Avanza hacia la compra del boleto
+	{ 20.0f, 2.0f, -12.0f, 270.0f, 0.0f, 2.0f}, //Avanza por el costado derecho
+	{ 25.0f, 2.0f, -12.0f, 360.0f, 0.0f, 3.0f},	//Avanza por la orilla y gira a la derecha
+	{ 30.0f, 2.0f, -12.0f, 270.0f, 0.0f, 3.0f},	//Avanza por la orilla y gira a la izquierda
+	{ 30.0f, 2.0f, -46.5f, 270.0f, 0.0f, 3.0f}, //Avanzo por enfrente del museo
+	{ 33.0f, 2.0f, -48.5f, 290.0f, 0.0f, 1.0f}, //Avanza por el primer edifico
+	{ 33.0f, 2.0f, -50.5f, 270.0f, 0.0f, 2.0f}, //Avanza por el costado primer edifico
+	{ 33.0f, 2.0f, -70.5f, 270.0f, 0.0f, 3.0f}, //Avanza por el costado del primer edifico
+	{ 33.0f, 2.0f, -80.0f, 360.0f, 0.0f, 5.0f}, //Avanza mirando el centro del primer edifico
+	{ 33.0f, 2.0f, -85.0f, 270.0f, 0.0f, 1.0f}, //Avanza retornando la mirada al pasillo principal
+	{ 33.0f, 2.0f, -98.0f, 180.0f, 0.0f, 2.0f}, //Avanza hasta el final del pasillo y voltea al segundo edificio
+	{ 15.0f, 2.0f, -98.0f, 180.0f, 0.0f, 3.0f}, //Avanza para el segundo edificio
+	{ 7.0f, 2.0f, -98.0f, 270.0f, 0.0f, 5.0f},  //Avanza mirando al centro del segundo edificio
+	{ 1.0f, 2.0f, -98.0f, 180.0f, 0.0f, 1.0f},  //Avanza retornando la vista sobre el pasillo
+	{ -7.0f, 2.0f, -98.0f, 180.0f, 0.0f, 1.0f},  //Avanza hasta el final del segundo pasillo
+	{ -7.0f, 2.0f, -110.0f, 225.0f, 0.0f, 2.0f},  //Observa en el mirador
+	{ -7.0f, 2.0f, -98.0f, 135.0f, 0.0f, 2.0f},  //Observa en el mirador
+	{ 1.0f, 2.0f, -98.0f, 0.0f, 0.0f, 2.0f},  //Retorna hacia atras
+	{ 33.0f, 2.0f, -98.0f, 90.0f, 0.0f, 3.0f }, // Regresa por el pasillo volteando hacia la entrada
+	{33.0f, 2.0f, -50.0f, 180.0f, 0.0f, 3.0f},  // Se acerca a la entrada
+	{12.0f, 2.0f, -24.0f, 180.0f, 0.0f, 3.0f},	// Se posiciona en la sala izqueirda
+	{-16.0f, 2.0f, -24.0f, 45.0f, 0.0f, 3.0f},  // Se fija por la sala de la izquierda
+	{-16.0f, 2.0f, -24.0f, 90.0f, 0.0f, 3.0f},  // Inspecciona lo restante de la sala izquierda
+	{ -9.0f, 2.0f, -18.0f, -87.0f, 0.0f, 3.0f },
+	{ -9.0f, 2.0f, -18.0f, -87.0f, 0.0f, 1.0f },
+	{-15.0f, 2.0f, -35.0, 270.0f, 0.0f, 3.0f},	// Avanza a la entrada de la sala derecha
+	{-15.0f, 2.0f, -35.0, 180.0f, 0.0f, 3.0f},	// Inspecciona la sala empezando por la izqueirda
+	{-15.0f, 2.0f, -35.0, 320.0f, 0.0f, 3.0f},	// Inspecciona la sala terminando por la derecha
+	{-28.0f, 5.0f, -31.0, 180.0f, 15.0f, 3.0f}, // Sube las escaleras
+	{-29.0, 8.0f, -17.0f, 45.0f, 15.0f, 3.0f},  // Sube las escaleras de la izquierda
+	{-29.0, 8.0f, -17.0f, 0.0f, 0.0f, 3.0f},	// Coloca bien la vista
+	{-17.0f, 9.0f, -22.0f, 45.0f, 0.0f, 3.0f},	// Inspecciona la sala donde esta
+	{-17.0f, 9.0f, -22.0f, 90.0f, 0.0f, 3.0f},  // termina de inspeccionar la sala
+	{ -12.0f, 9.0f, -29.6482f, 54.0f, 0.0f, 3.0f},
+	{ -12.0f, 9.0f, -30.0f, 117.25f, 22.5f, 3.0f},
+	{ -12.0f, 9.0f, -29.8716f, -90.0f, 20.0f, 3.0f },
+	{ -12.0f, 9.0f, -29.8716f, -90.0f, 20.0f, 1.0f },
+	{ -18.0f, 9.0f, -23.0f, -143.25f, 6.25f, 3.0f}, //Mural grande
+	{ -18.0f, 9.0f, -23.0f, -143.25f, 6.25f, 1.0f},
+	{-20.0f, 9.0f, -34.0f, -88.0f, 0.0f, 3.0f}, // Insecciona la segunda sala
+	{-8.6f, 9.0f, -42.0f, 92.0f, 0.0f, 3.0f},
+	{-8.6f, 9.0f, -42.0f, 92.0f, 0.0f, 1.0f}, // Instrumentos
+	{-35.0f, 9.0f, -40.0f, 177.0f, 0.0f, 3.0f },// vasijas
+	{-35.0f, 9.0f, -40.0f, 177.0f, 0.0f, 1.0f },
+	{-35.0f, 9.0f, -40.0f, 177.0f, 78.0f, 3.0f },//mural en el techo
+	{-35.0f, 9.0f, -40.0f, 177.0f, 78.0f, 1.0f },
+	{-42.0f, 9.0f, -42.0f, 89.0f, -0.25f, 3.0f }, // escultura
+	{-42.f, 9.0f, -29.0f, 88.0f, 0.0f, 3.0f },
+	{-42.0f, 9.0f, -28.0f, 23.75f, -7.25f, 3.0f },
+	{-42.0f, 9.0f, -28.0f, 23.75f, -7.25f, 1.0f },
 	{-41.0f, 10.0f, -28.0f, 0.0f, 5.0f, 3.0f},   // Se posicina en las escaleras para el tercer piso
 	{-33.0f, 12.0f, -28.0f, 0.0f, 5.0f, 3.0f},   // Avanza en las escaleras
 	{-33.0f, 12.0f, -28.0f, -90.0f, 5.0f, 3.0f},  // Gira a la izquierda
 	{-32.0f, 13.0f, -31.0f, -90.0f, 5.0f, 3.0f}, // Avanza ligeramente
 	{-41.0f, 20.0f, -31.0f, -180.f, 30.0f, 3.0f}, // sube al tercer piso
 	{-41.0f, 20.0f, -31.0f, -90.0f, 0.0f, 3.0f},  // Avanza para inspeccionar la primera sala del tercer piso
-	{-42.0f, 20.0f, -33.0f, -90.0f, 0.0f, 3.0f},   // Inspecciona la sala
-	{-35.0f, 21.0f, -38.0f, 0.0f, 0.0f, 3.0f},	  // termina de inspeccionar la primera sala 
-	{-35.0f, 21.0f, -38.0f, -90.0f, 0.0f, 3.0f},  // termina de inspeccionar la sala.
-	{-41.0f, 21.0f, -29.f, 45.0f, 0.0f, 3.0f },		
-	{-37.0f, 21.0f, -20.0f, 45.0f, 0.0f, 3.0f},
-	{-37.0f, 21.0f, -20.0f, 0.0f, 0.0f, 3.0f},
-	{-37.0f, 21.0f, -20.0f, 90.0f, 0.0f, 3.0f},
-	{-41.0f, 21.0f, -28.0f, 0.0f, 0.0f, 3.0f },
-	{-34.0f, 23.0f, -28.0f, 0.0f, 10.0f, 3.0f},
+	{-37.0f, 20.0f, -38.0f, -49.75f, 0.0f, 3.0f },
+	{ -37.0f, 20.0f, -38.9257f, -21.75f, 0.0f, 3.0f },
+	{ -37.0f, 20.0f, -38.9257f, -127.25f, 0.0f, 3.0f },
+	{ -40.0f, 20.0f, -36.0f, 103.0f, 0.0f, 3.0f },
+	{ -41.0f, 20.0f, -29.0f, 85.0f, 0.0f, 3.0f },
+	{ -37.0f, 20.0f, -21.0f, 61.0f, 0.0f, 3.0f },
+	{ -37.0f, 20.0f, -21.0f, 13.0f, 0.0f, 3.0f },// ispecciona la segunda sala
+	{ -37.0f, 20.0f, -21.0f, 133.0f, 0.0f, 3.0f },
 	{-34.0f, 23.0f, -28.0f, -90.0f, 10.0f, 3.0f},  // Escaleras al tercer piso
 	{-32.0f, 23.0f, -31.0f, -90.f, 0.0f, 3.0f},	 // avanza ligeramente	
 	{-40.0f, 31.0f, -32.0f, -180.f, 30.f, 3.0f}, //LLega al ultimo puso
@@ -218,8 +240,6 @@ FRAME_CAMERA frames[] = {
 	{-1.5f, 32.0f, -41.0f, -45.0f, -45.0f, 3.0f},
 	{-1.5f, 32.0f, -41.0f, 0.0f, -45.0f, 3.0f},
 	{-1.5f, 32.0f, -41.0f, 45.0f, -45.0f, 3.0f}
-
-
 
 
 };
@@ -429,6 +449,15 @@ int main()
 
 	glm::mat4 projection = glm::perspective(camera.GetZoom(), (GLfloat)SCREEN_WIDTH / (GLfloat)SCREEN_HEIGHT, 0.1f, 100.0f);
 
+	// Biblioteca de audio 
+	sf::Music music;
+	if (!music.openFromFile("ringtones-pink-panther.mp3")) {
+		std::cout << "No se pudo cargar la musica" << std::endl;
+		return -1; // Salir si no se puede cargar la música
+	}
+	music.play();
+	music.setVolume(20.0f);
+
 	// Game loop
 	while (!glfwWindowShouldClose(window))
 	{
@@ -454,11 +483,6 @@ int main()
 		// OpenGL options
 		glEnable(GL_DEPTH_TEST);
 
-
-
-		//Load Model
-
-
 		// Use cooresponding shader when setting uniforms/drawing objects
 		lightingShader.Use();
 
@@ -475,14 +499,7 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 0.0f, 0.0f, 0.0f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.0f, 0.0f, 0.0f);
 
-
-		// Point light 1
-		glm::vec3 lightColor = glm::vec3(0);
-		lightColor.x = abs(sin(glfwGetTime() * Light1.x));
-		lightColor.y = abs(sin(glfwGetTime() * Light1.y));
-		lightColor.z = sin(glfwGetTime() * Light1.z);
-
-		// Luz Cafeteria
+		// Luz
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), 0.5f, 0.3f, 0.0f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), 0.1f, 0.05f, 0.0f);
@@ -510,17 +527,7 @@ int main()
 
 		glm::mat4 model = glm::mat4(1);
 
-
-		//Se dibuja esfera para el centro del patio principal
-		model = glm::translate(model, centro);
-		glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 1);
-		Ball.Draw(lightingShader);
-		glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
-
+		// Variables necesarias para las animaciones
 		glm::vec3 centroPajaro = glm::vec3(20.0f, 2.0f, -10.0f);
 		float radio = 2.0f;
 		glm::vec3 posicionQ = glm::vec3(17.0f, -3.0f, -62.0f);
@@ -530,6 +537,7 @@ int main()
 		glm::vec3 posHeli = glm::vec3(53.0f, 10.0f, -27.0f);
 		glm::vec3 centroVuelo = glm::vec3(20.0f, 15.0f, -82.0f);
 		float amplitudVuelo = 30.0f;
+		// Llamadas a las funciones de animación
 		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
 		AnimarQuetzal(lightingShader, modelLoc, quetzalB, quetzalH, quetzalT, posicionQ, true,currentFrame);
 		AnimarPersonaje(lightingShader, modelLoc, girlL, girlB, girlPos, 0.6f, currentFrame);
@@ -538,9 +546,6 @@ int main()
 		AnimarHelicoptero(lightingShader, modelLoc, heliCabin, heliProp, posHeli, 1.0f, currentFrame);
 		AnimarAvionInfinito(lightingShader, modelLoc, plane, centroVuelo, amplitudVuelo, 0.08f, currentFrame);
 
-		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -30.0f), 0.5);
-		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -40.0f), 0.5);
-		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -50.0f), 0.5);
 		//Cubriendo areas verdes costadod derecho entrada
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -5.0f), 0.5);
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(88.0f, 0.0f, -5.0f), 0.5);
@@ -588,70 +593,6 @@ int main()
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
-		// Se dibuja el primer cuadro del museo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-19.44f, 3.f, -45.0f));
-		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
-		model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.5f));
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Cuadro01.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
-
-		// Se dibuja el segundo cuadro del museo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-18.41f, 3.57f, -15.36f));
-		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
-		model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.5f));
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Cuadro02.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
-
-		// Se dibuja el tercer cuadro del museo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-8.13f, 3.15f, -44.7f));
-		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
-		model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.5f));
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Cuadro03.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
-
-		// Se dibuja el cuarto cuadro del museo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-27.323f, 2.95328f, -44.7903f));
-		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
-		model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.5f));
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Cuadro04.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
-
-		
-
-		// Se dibuja el cuadro mas grande del museo
-		model = glm::mat4(1);
-		model = glm::translate(model, posicionesCuadros[4]);
-		model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Mural01.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		// Se dibuja la estatua en el primer piso del museo
 		model = glm::mat4(1);
 		model = glm::translate(model, glm::vec3(-42.0f, 7.4f, -18.0f));
@@ -661,53 +602,12 @@ int main()
 		
 		
 		glBindVertexArray(0);
-
-
-
-
-		// Se dibuja el segundo cuadro del mural del museo
-		model = glm::mat4(1);
-		model = glm::translate(model, posicionesCuadros[5]);
-		//model = glm::rotate(model, glm::radians(0.0f), glm::vec3(0.0f,1.0f,0.0f));
-		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
-		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Mural02.Draw(lightingShader);
-		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
-		glBindVertexArray(0);
-
-
-
-
-
-
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
 		modelLoc = glGetUniformLocation(lampShader.Program, "model");
 		viewLoc = glGetUniformLocation(lampShader.Program, "view");
 		projLoc = glGetUniformLocation(lampShader.Program, "projection");
-
-		// Set matrices
-		//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		//model = glm::mat4(1);
-		//model = glm::translate(model, lightPos);
-		//model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-
-		// Se dibuja la primera luz puntual
-		// model = glm::mat4(1);
-		// model = glm::translate(model, pointLightPositions[0]);
-		// model = glm::scale(model, glm::vec3(0.2f)); // Make it a smaller cube
-		// glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		// glBindVertexArray(VAO);
-		// glDrawArrays(GL_TRIANGLES, 0, 36);
-		// glBindVertexArray(0);
-
-
-
 		// Swap the screen buffers
 		glfwSwapBuffers(window);
 	}
@@ -752,36 +652,10 @@ void DoMovement()
 
 
 	}
-
-	if (keys[GLFW_KEY_T])
-	{
-		pointLightPositions[0].x += 0.01f;
-	}
-	if (keys[GLFW_KEY_G])
-	{
-		pointLightPositions[0].x -= 0.01f;
-	}
-
-	if (keys[GLFW_KEY_Y])
-	{
-		pointLightPositions[0].y += 0.01f;
-	}
-
-	if (keys[GLFW_KEY_H])
-	{
-		pointLightPositions[0].y -= 0.01f;
-	}
-	if (keys[GLFW_KEY_U])
-	{
-		pointLightPositions[0].z -= 0.1f;
-	}
-	if (keys[GLFW_KEY_J])
-	{
-		pointLightPositions[0].z += 0.01f;
-	}
 	// Se posiciona la camara en la entrada del museo al presionar la tecla 1
 	if (keys[GLFW_KEY_1]) {
-		camera.TeleportAndReset(glm::vec3(50.0f, 3.0f, 5.0f));
+		camera.TeleportAndReset(glm::vec3(-13.9923f, 30.1483f, -46.064f));
+		camera.SetRotation(-54.75f, -19.75f);
 	}
 	if (keys[GLFW_KEY_2]) {
 		if (recorrido_automatico == false) {
@@ -797,7 +671,8 @@ void DoMovement()
 	}
 	if (keys[GLFW_KEY_4])
 	{
-		camera.SetPosition(glm::vec3(13.0f, 10.0f, -39.0f));
+		camera.TeleportAndReset(glm::vec3(-16.7981f, 15.0926f, -27.1761f));
+		camera.SetRotation(91.0f, -0.75f);
 	}
 
 }
@@ -812,15 +687,18 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 
 	if (key == GLFW_KEY_P && action == GLFW_PRESS)
 	{
-		// Obtiene la posición actual de la cámara
 		glm::vec3 pos = camera.GetPosition();
 
-		// Imprime en formato listo para copiar y pegar (ej: 10.5f, 2.0f, -5.0f)
-		std::cout << "\nCOORDENADAS CAPTURADAS: " << std::endl;
-		std::cout << "glm::vec3(" << pos.x << "f, " << pos.y << "f, " << pos.z << "f)" << std::endl;
+		// Obtener el vector frontal (hacia donde mira)
+		// Asumiendo que tienes un método GetFront() o acceso a camera.Front
+		glm::vec3 front = camera.GetFront();
 
-		// Opcional: Imprimir también la dirección hacia donde miras (Yaw/Pitch)
-		// por si necesitas rotar el objeto.
+		// Ingeniería inversa de los ángulos (Matemáticas de Euler)
+		float pitch = glm::degrees(asin(front.y));
+		float yaw = glm::degrees(atan2(front.z, front.x));
+
+		std::cout << "{ " << pos.x << "f, " << pos.y << "f, " << pos.z << "f, "
+			<< yaw << "f, " << pitch << "f, 3.0f }," << std::endl;
 	}
 
 	if (key >= 0 && key < 1024)
