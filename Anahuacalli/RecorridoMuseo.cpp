@@ -32,6 +32,7 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+
 // Funciones creadas
 //Dibuja las ventanas de diferentes edificios.
 void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc); 
@@ -45,13 +46,13 @@ void AnimarPersonaje(Shader& shader, GLint modelLoc, Model& piernas, Model& tors
 //void AnimarFotografo(Shader& shader, GLint modelLoc, Model& base, Model& cabeza, glm::vec3 posicion, float escala, float tiempo);
 void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& parteDelantera, glm::vec3 posicion, float escala, float tiempo);
 // Animacion de gato
-void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
-	Model& legFL, Model& legFR, Model& legBL, Model& legBR,
-	glm::vec3 posicion, float escala, float tiempo);
+void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head, Model& legFL, Model& legFR, Model& legBL, Model& legBR, glm::vec3 posicion, float escala, float tiempo);
 // Animacion de helicoptero
 void AnimarHelicoptero(Shader& shader, GLint modelLoc, Model& cuerpo, Model& helice, glm::vec3 pos, float escala, float tiempo);
 // Animacion de avion volando en forma infinito
 void AnimarAvionInfinito(Shader& shader, GLint modelLoc, Model& modeloAvion, glm::vec3 centro, float radio, float escala, float tiempo);
+// Animacion de hacha giratoria
+void AnimarHacha(Shader& shader, GLint modelLoc, Model& modeloEspada, glm::vec3 posicion, float escala, float tiempo);
 // Dibuja un objeto compuesto por dos partes (ej. tronco y hojas)
 void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala);
 // Dibuja un solo arbol
@@ -178,70 +179,69 @@ FRAME_CAMERA frames[] = {
 	{ -7.0f, 2.0f, -98.0f, 180.0f, 0.0f, 1.0f},  //Avanza hasta el final del segundo pasillo
 	{ -7.0f, 2.0f, -110.0f, 225.0f, 0.0f, 2.0f},  //Observa en el mirador
 	{ -7.0f, 2.0f, -98.0f, 135.0f, 0.0f, 2.0f},  //Observa en el mirador
-	{ 1.0f, 2.0f, -98.0f, 0.0f, 0.0f, 2.0f},  //Retorna hacia atras
-	{ 33.0f, 2.0f, -98.0f, 90.0f, 0.0f, 3.0f }, // Regresa por el pasillo volteando hacia la entrada
-	{33.0f, 2.0f, -50.0f, 180.0f, 0.0f, 3.0f},  // Se acerca a la entrada
-	{12.0f, 2.0f, -24.0f, 180.0f, 0.0f, 3.0f},	// Se posiciona en la sala izqueirda
-	{-16.0f, 2.0f, -24.0f, 45.0f, 0.0f, 3.0f},  // Se fija por la sala de la izquierda
-	{-16.0f, 2.0f, -24.0f, 90.0f, 0.0f, 3.0f},  // Inspecciona lo restante de la sala izquierda
-	{ -9.0f, 2.0f, -18.0f, -87.0f, 0.0f, 3.0f },
-	{ -9.0f, 2.0f, -18.0f, -87.0f, 0.0f, 1.0f },
-	{-15.0f, 2.0f, -35.0, 270.0f, 0.0f, 3.0f},	// Avanza a la entrada de la sala derecha
-	{-15.0f, 2.0f, -35.0, 180.0f, 0.0f, 3.0f},	// Inspecciona la sala empezando por la izqueirda
-	{-15.0f, 2.0f, -35.0, 320.0f, 0.0f, 3.0f},	// Inspecciona la sala terminando por la derecha
-	{-28.0f, 5.0f, -31.0, 180.0f, 15.0f, 3.0f}, // Sube las escaleras
-	{-29.0, 8.0f, -17.0f, 45.0f, 15.0f, 3.0f},  // Sube las escaleras de la izquierda
-	{-29.0, 8.0f, -17.0f, 0.0f, 0.0f, 3.0f},	// Coloca bien la vista
-	{-17.0f, 9.0f, -22.0f, 45.0f, 0.0f, 3.0f},	// Inspecciona la sala donde esta
-	{-17.0f, 9.0f, -22.0f, 90.0f, 0.0f, 3.0f},  // termina de inspeccionar la sala
-	{ -12.0f, 9.0f, -29.6482f, 54.0f, 0.0f, 3.0f},
-	{ -12.0f, 9.0f, -30.0f, 117.25f, 22.5f, 3.0f},
-	{ -12.0f, 9.0f, -29.8716f, -90.0f, 20.0f, 3.0f },
-	{ -12.0f, 9.0f, -29.8716f, -90.0f, 20.0f, 1.0f },
-	{ -18.0f, 9.0f, -23.0f, -143.25f, 6.25f, 3.0f}, //Mural grande
-	{ -18.0f, 9.0f, -23.0f, -143.25f, 6.25f, 1.0f},
-	{-20.0f, 9.0f, -34.0f, -88.0f, 0.0f, 3.0f}, // Insecciona la segunda sala
-	{-8.6f, 9.0f, -42.0f, 92.0f, 0.0f, 3.0f},
-	{-8.6f, 9.0f, -42.0f, 92.0f, 0.0f, 1.0f}, // Instrumentos
-	{-35.0f, 9.0f, -40.0f, 177.0f, 0.0f, 3.0f },// vasijas
-	{-35.0f, 9.0f, -40.0f, 177.0f, 0.0f, 1.0f },
-	{-35.0f, 9.0f, -40.0f, 177.0f, 78.0f, 3.0f },//mural en el techo
-	{-35.0f, 9.0f, -40.0f, 177.0f, 78.0f, 1.0f },
-	{-42.0f, 9.0f, -42.0f, 89.0f, -0.25f, 3.0f }, // escultura
-	{-42.f, 9.0f, -29.0f, 88.0f, 0.0f, 3.0f },
-	{-42.0f, 9.0f, -28.0f, 23.75f, -7.25f, 3.0f },
-	{-42.0f, 9.0f, -28.0f, 23.75f, -7.25f, 1.0f },
-	{-41.0f, 10.0f, -28.0f, 0.0f, 5.0f, 3.0f},   // Se posicina en las escaleras para el tercer piso
-	{-33.0f, 12.0f, -28.0f, 0.0f, 5.0f, 3.0f},   // Avanza en las escaleras
-	{-33.0f, 12.0f, -28.0f, -90.0f, 5.0f, 3.0f},  // Gira a la izquierda
-	{-32.0f, 13.0f, -31.0f, -90.0f, 5.0f, 3.0f}, // Avanza ligeramente
-	{-41.0f, 20.0f, -31.0f, -180.f, 30.0f, 3.0f}, // sube al tercer piso
-	{-41.0f, 20.0f, -31.0f, -90.0f, 0.0f, 3.0f},  // Avanza para inspeccionar la primera sala del tercer piso
-	{-37.0f, 20.0f, -38.0f, -49.75f, 0.0f, 3.0f },
-	{ -37.0f, 20.0f, -38.9257f, -21.75f, 0.0f, 3.0f },
-	{ -37.0f, 20.0f, -38.9257f, -127.25f, 0.0f, 3.0f },
-	{ -40.0f, 20.0f, -36.0f, 103.0f, 0.0f, 3.0f },
-	{ -41.0f, 20.0f, -29.0f, 85.0f, 0.0f, 3.0f },
-	{ -37.0f, 20.0f, -21.0f, 61.0f, 0.0f, 3.0f },
-	{ -37.0f, 20.0f, -21.0f, 13.0f, 0.0f, 3.0f },// ispecciona la segunda sala
-	{ -37.0f, 20.0f, -21.0f, 133.0f, 0.0f, 3.0f },
-	{-34.0f, 23.0f, -28.0f, -90.0f, 10.0f, 3.0f},  // Escaleras al tercer piso
-	{-32.0f, 23.0f, -31.0f, -90.f, 0.0f, 3.0f},	 // avanza ligeramente	
-	{-40.0f, 31.0f, -32.0f, -180.f, 30.f, 3.0f}, //LLega al ultimo puso
-	{-42.0f, 31.0f, -17.0f, 0.0f, 0.0f, 3.0f}, // Se posiciona en una esquina
-	{-0.3f, 31.0f, -17.0f, 0.0f, 0.0f, 3.0f},
-	{-0.3f, 31.0f, -17.0f, 0.0f, -45.0f, 3.0f},
-	{-0.3f, 31.0f, -17.0f, 0.0f, 0.0f, 3.0f},
-	{-0.3f, 31.0f, -17.0f, -180.0f, 0.0f, 3.0f},
-	{-42.0f, 31.0f, -17.0f, -90.0f, 0.0f, 3.0f},
-	{-42.0f, 32.0f, -42.0f, -90.0f, 0.0f, 3.0f},
-	{-42.0f, 32.0f, -42.0f, 0.0f, 0.0f, 3.0f},
-	{-1.5f, 32.0f, -41.0f, 0.0f, 0.0f, 3.0f},
-	{-1.5f, 32.0f, -41.0f, -45.0f, -45.0f, 3.0f},
-	{-1.5f, 32.0f, -41.0f, 0.0f, -45.0f, 3.0f},
-	{-1.5f, 32.0f, -41.0f, 45.0f, -45.0f, 3.0f}
-
-
+	{ 10.0f, 2.0f, -98.0f, 0.0f, 0.0f, 3.0f},	//Retorna hacia atras mirando hacia el pasillo nuevamente
+	{ 14.0f, 2.0f, -98.0f, 90.0f, 0.0f, 1.0f},	//Retorna hacia atras mira hacia la salida
+	{ 14.0f, 2.0f, -44.0f, 90.0f, 0.0f, 5.0f},	//Avanza hacia el centro de los dos edificios
+	{ 14.0f, 2.0f, -28.0f, 180.0f, 0.0f, 2.5f},	//Avanza hacia el centro del patio mientras voltea hacia el museo
+	{ 0.0f, 2.0f, -28.0f, 180.0f, 0.0f, 1.0f},	//Avanza hacia la puerta principal del museo
+	{ -5.0f, 2.0f, -30.0f, 90.0f, 0.0f, 1.0f},    // Apartir de aqui empieza la animación del recorrido del museo
+	{ -5.0f, 2.0f, -30.0f, 90.0f, 0.0f, 5.0f},
+	{ -15.0f, 2.0f, -28.0f, 180.0f, 0.0f, 2.0f},
+	{ -15.0f, 2.0f, -24.0f, 135.0f, 0.0f, 1.0f},
+	{ -8.0f, 2.0f, -20.0f, -90.0f, 0.0f, 5.0f},
+	{ -8.0f, 2.0f, -20.0f, -90.0f, 0.0f, 3.0f},
+	{ -16.0f, 2.0f, -28.0f, -135.0f, 0.0f, 5.0f},
+	{ -16.0f, 2.0f, -28.0f, 225.0f, 0.0f, 0.0f}, //Cambio inmediato del angulo negativo al positivo
+	{ -17.0f, 2.0f, -31.0f, 180.0f, 0.0f, 1.0f},
+	{ -30.0f, 5.0f, -31.0f, 90.0f, 0.0f, 2.0f},
+	{ -30.0f, 10.0f, -20.0f, 90.0f, 0.0f, 2.0f},
+	{ -25.0f, 10.0f, -20.0f, 45.0f, 0.0f, 2.0f},
+	{ -21.0f, 10.0f, -20.0f, 90.0f, 0.0f, 2.0f},
+	{ -25.5f, 14.0f, -27.75f, 180.0f, 0.0f, 2.0f},  //Mural de Diego Rivera
+	{ -25.5f, 14.0f, -27.75f, 180.0f, 0.0f, 3.0f},  //Pausa para observar el mural
+	{ -25.0f, 11.0f, -29.5f, 270.0f, 0.0f, 2.0f},	//Cuadro de Frida Kahlo
+	{ -25.0f, 11.0f, -29.5f, 270.0f, 0.0f, 3.0f},	//Pausa para observarlo
+	{ -12.0f, 11.0f, -29.5f, 405.0f, 0.0f, 5.0f},
+	{ -12.0f, 11.0f, -29.5f, 405.0f, 0.0f, 5.0f},   //Pausa para observar el cuadro lejano
+	{ -17.0f, 16.0f, -26.25f, 90.0f, 0.0f, 5.0f},	//Mural 2
+	{ -17.0f, 16.0f, -26.25f, 90.0f, 0.0f, 3.0f},	//Pausa para observar el mural
+	{ -20.0f, 11.0f, -40.0f, 270.0f, 0.0f, 3.0f},
+	{ -20.0f, 11.0f, -40.0f, 270.0f, 0.0f, 2.0f},
+	{ -35.0f, 11.0f, -40.0f, 180.0f, 0.0f, 3.0f},
+	{ -35.0f, 11.0f, -40.0f, 180.0f, 80.0f, 3.0f},
+	{ -35.0f, 11.0f, -40.0f, 180.0f, 80.0f, 2.0f},
+	{ -43.0f, 11.0f, -40.0f, 90.0f, 0.0f, 3.0f},
+	{ -43.0f, 11.0f, -31.0f, 0.0f, -20.0f, 3.0f},
+	{ -43.0f, 11.0f, -25.0f, 0.0f, 0.0f, 3.0f},
+	{ -33.0f, 11.0f, -25.0f, -90.0f, 0.0f, 1.0f},
+	{ -33.0f, 14.0f, -31.0f, -90.0f, 25.0f, 1.0f},
+	{ -33.0f, 14.0f, -31.0f, -180.0f, 25.0f, 1.0f},
+	{ -43.0f, 22.0f, -31.0f, -90.0f, 0.0f, 2.0f}, // Centro escaleras segundo piso
+	{ -35.0f, 22.0f, -44.0f, 0.0f, 0.0f, 2.0f},
+	{ -23.0f, 22.0f, -44.0f, 90.0f, 0.0f, 3.0f},
+	{ -16.0f, 22.0f, -44.0f, 45.0f, 0.0f, 2.0f},
+	{ -10.0f, 22.0f, -44.0f, 90.0f, 0.0f, 2.0f},
+	{ -8.0f, 22.0f, -42.0f, 0.0f, 0.0f, 2.0f},
+	{ -8.0f, 22.0f, -42.0f, 0.0f, 0.0f, 2.0f},
+	{ -35.0f, 22.0f, -42.0f, 90.0f, 0.0f, 5.0f},
+	{ -43.0f, 22.0f, -31.0f, 45.0f, 0.0f, 5.0f}, // Centro escaleras segundo piso
+	{ -37.0f, 22.0f, -25.0f, 0.0f, 0.0f, 3.0f},  //Escaleras tercer piso
+	{ -42.0f, 22.0f, -18.0f, -90.0f, 0.0f, 3.0f},
+	{ -34.0f, 22.0f, -18.0f, -45.0f, 0.0f, 3.0f},
+	{ -28.5f, 22.0f, -18.0f, -90.0f, 0.0f, 3.0f},
+	{ -25.0f, 22.0f, -18.0f, -45.0f, 0.0f, 3.0f},
+	{ -21.0f, 22.0f, -18.0f, -90.0f, 0.0f, 3.0f},
+	{ -16.0f, 22.0f, -18.0f, -45.0f, 0.0f, 3.0f},
+	{ -11.0f, 22.0f, -18.0f, -90.0f, 0.0f, 3.0f},
+	{ -6.0f, 22.0f, -18.0f, 0.0f, 0.0f, 3.0f},
+	{ -6.0f, 22.0f, -18.0f, 0.0f, 0.0f, 3.0f},
+	{ -37.0f, 22.0f, -18.0f, -90.0f, 0.0f, 5.0f},
+	{ -35.0f, 22.0f, -26.0f, -45.0f, 0.0f, 3.0f},
+	{ -32.0f, 22.0f, -31.0f, -180.0f, 50.0f, 3.0f},
+	{ -41.0f, 32.0f, -31.0f, -90.0f, 0.0f, 3.0f},
+	{ -41.0f, 45.0f, -31.0f, 0.0f, 0.0f, 3.0f},
+	{ 0.0f, 45.0f, -31.0f, 0.0f, 0.0f, 3.0f},
+	{ 0.0f, 2.0f, -31.0f, 0.0f, 0.0f, 3.0f},
 };
 
 glm::vec3 Light1 = glm::vec3(0);
@@ -277,32 +277,31 @@ void interpolation(GLfloat deltaTime)
 {
 	// Verificar si el recorrido ha terminado ANTES de acceder a frames
 	if (indice_frame >= total_keyframes - 1) {
-		// Asegura que la cámara está en la posición del último keyframe (que ya está hecha por LERP)
+		// Asegura que la cámara está en la posición del último keyframe
 		recorrido_automatico = false;
 		// Reiniciar el contador de tiempo y el índice para el próximo inicio
 		tiempo_transcurrido = 0.0f;
 		indice_frame = 0;
-		// Reset_Camera_Animation(); // Resetea la cámara al primer keyframe
 		recorrido_automatico = false; // Detiene el recorrido automático
-		return; // Termina la función
+		return;
 	}
 
-	// 1. Obtener los keyframes de inicio y fin
+	// keyframes de inicio y fin
 	FRAME_CAMERA start = frames[indice_frame];
 	FRAME_CAMERA end = frames[indice_frame + 1];
 
-	// 2. Actualizar el tiempo transcurrido para este segmento
+	// Actualizar el tiempo transcurrido para este segmento
 	tiempo_transcurrido += deltaTime;
 
-	// 3. Calcular el factor de progreso (t) [0.0 a 1.0]
+	// Calcular el factor de progreso (t) [0.0 a 1.0]
 	float t = tiempo_transcurrido / end.time;
 
-	// 4. Asegurarse de que t no exceda 1.0
+	// Asegurarse de que t no exceda 1.0
 	if (t > 1.0f) {
 		t = 1.0f; // Evita el overshoot
 	}
 
-	// 5. Aplicar la Interpolación Lineal (LERP)
+	// Interpolación Lineal
 	// LERP(A, B, t) = A + (B - A) * t
 
 	// Interpolación de Posición
@@ -318,7 +317,7 @@ void interpolation(GLfloat deltaTime)
 
 	camera.SetRotation(rot_horizontal, rot_vertical);
 
-	// 6. Verificar si el movimiento ha terminado
+	// Verificar si el movimiento ha terminado
 	if (t >= 1.0f) {
 		// Mueve al siguiente keyframe
 		indice_frame++;
@@ -333,13 +332,7 @@ int main()
 {
 	// Init GLFW
 	glfwInit();
-	// Set all the required options for GLFW
-	/*glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
-
+	
 	// Create a GLFWwindow object that we can use for GLFW's functions
 	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Fuentes de luz", nullptr, nullptr);
 
@@ -382,18 +375,12 @@ int main()
 	Model vidrios[] = {
 		Model((char*)"Models/Cristal1.obj"),
 		Model((char*)"Models/Cristal2.obj"),
-		Model((char*)"Models/Cristal3.obj")
+		Model((char*)"Models/Cristal3.obj"),
+		Model((char*)"Models/Cristal4.obj")
+
 	};
 
-	Model Ball((char*)"Models/ball.obj");
 	Model MuseoAnahuacalli((char*)"Models/Museo_Anahuacalli.obj");
-	Model Cesped((char*)"Models/Cesped.obj");
-	Model Cuadro01((char*)"Models/Cuadro1.obj");
-	Model Cuadro02((char*)"Models/Cuadro2.obj");
-	Model Cuadro03((char*)"Models/Cuadro3.obj");
-	Model Cuadro04((char*)"Models/Cuadro4.obj");
-	Model Mural01((char*)"Models/Mural1.obj");
-	Model Mural02((char*)"Models/Mural2.obj");
 	Model pinoL((char*)"Models/PinosHojas.obj");
 	Model pinoB((char*)"Models/PinosRama.obj");
 	Model flores((char*)"Models/Flores.obj");
@@ -427,6 +414,8 @@ int main()
 	Model heliProp((char*)"Models/heliProp.obj");
 	//Avion
 	Model plane((char*)"Models/floatplane.obj");
+	// Hacha
+	Model axe((char*)"Models/Axe.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -455,6 +444,7 @@ int main()
 		std::cout << "No se pudo cargar la musica" << std::endl;
 		return -1; // Salir si no se puede cargar la música
 	}
+	music.setLooping(true); // Configurar para que la música se repita
 	music.play();
 	music.setVolume(20.0f);
 
@@ -545,6 +535,8 @@ int main()
 		AnimarGato(lightingShader, modelLoc, catB, catH, catFL, catFR, catBL, catBR, posGato, 4.0f, currentFrame);
 		AnimarHelicoptero(lightingShader, modelLoc, heliCabin, heliProp, posHeli, 1.0f, currentFrame);
 		AnimarAvionInfinito(lightingShader, modelLoc, plane, centroVuelo, amplitudVuelo, 0.08f, currentFrame);
+		glm::vec3 posAxe = glm::vec3(13.0f, 2.0f, -27.0f); // Ajusta la altura Y
+		AnimarHacha(lightingShader, modelLoc, axe, posAxe, 0.2f, currentFrame);
 
 		//Cubriendo areas verdes costadod derecho entrada
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(78.0f, 0.0f, -5.0f), 0.5);
@@ -592,16 +584,7 @@ int main()
 		Dibujar_Vidrios(lightingShader, vidrios, modelLoc);
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
-
-		// Se dibuja la estatua en el primer piso del museo
-		model = glm::mat4(1);
-		model = glm::translate(model, glm::vec3(-42.0f, 7.4f, -18.0f));
-		model = glm::scale(model, glm::vec3(0.5f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		diane.Draw(lightingShader);
 		
-		
-		glBindVertexArray(0);
 		// Also draw the lamp object, again binding the appropriate shader
 		lampShader.Use();
 		// Get location objects for the matrices on the lamp shader (these could be different on a different shader)
@@ -654,8 +637,8 @@ void DoMovement()
 	}
 	// Se posiciona la camara en la entrada del museo al presionar la tecla 1
 	if (keys[GLFW_KEY_1]) {
-		camera.TeleportAndReset(glm::vec3(-13.9923f, 30.1483f, -46.064f));
-		camera.SetRotation(-54.75f, -19.75f);
+		camera.TeleportAndReset(glm::vec3(50.0f, 3.0f, 5.0f));
+		Reset_Camera_Animation();
 	}
 	if (keys[GLFW_KEY_2]) {
 		if (recorrido_automatico == false) {
@@ -674,7 +657,26 @@ void DoMovement()
 		camera.TeleportAndReset(glm::vec3(-16.7981f, 15.0926f, -27.1761f));
 		camera.SetRotation(91.0f, -0.75f);
 	}
-
+	if (keys[GLFW_KEY_5]) {
+		camera.TeleportAndReset(glm::vec3(-13.9923f, 30.1483f, -46.064f));
+		camera.SetRotation(-54.75f, -19.75f);
+	}
+	if (keys[GLFW_KEY_0]) {
+		camera.SetPosition(pos_cuadros[0]);
+		camera.SetRotation(rotaciones[1], rotaciones[0]);
+	}
+	if (keys[GLFW_KEY_9]) {
+		camera.SetPosition(pos_cuadros[1]);
+		camera.SetRotation(rotaciones[2], rotaciones[0]);
+	}
+	if (keys[GLFW_KEY_8]) {
+		camera.SetPosition(pos_cuadros[2]);
+		camera.SetRotation(rotaciones[3], rotaciones[0]);
+	}
+	if (keys[GLFW_KEY_7]) {
+		camera.SetPosition(pos_cuadros[3]);
+		camera.SetRotation(rotaciones[3], rotaciones[0]);
+	}
 }
 
 // Is called whenever a key is pressed/released via GLFW
@@ -683,22 +685,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	}
-
-	if (key == GLFW_KEY_P && action == GLFW_PRESS)
-	{
-		glm::vec3 pos = camera.GetPosition();
-
-		// Obtener el vector frontal (hacia donde mira)
-		// Asumiendo que tienes un método GetFront() o acceso a camera.Front
-		glm::vec3 front = camera.GetFront();
-
-		// Ingeniería inversa de los ángulos (Matemáticas de Euler)
-		float pitch = glm::degrees(asin(front.y));
-		float yaw = glm::degrees(atan2(front.z, front.x));
-
-		std::cout << "{ " << pos.x << "f, " << pos.y << "f, " << pos.z << "f, "
-			<< yaw << "f, " << pitch << "f, 3.0f }," << std::endl;
 	}
 
 	if (key >= 0 && key < 1024)
@@ -710,19 +696,6 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode
 		else if (action == GLFW_RELEASE)
 		{
 			keys[key] = false;
-		}
-	}
-
-	if (keys[GLFW_KEY_SPACE])
-	{
-		active = !active;
-		if (active)
-		{
-			Light1 = glm::vec3(1.0f, 1.0f, 0.0f);
-		}
-		else
-		{
-			Light1 = glm::vec3(0);//Cuado es solo un valor en los 3 vectores pueden dejar solo una componente
 		}
 	}
 }
@@ -770,7 +743,7 @@ void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniform1i(glGetUniformLocation(shader.Program, "transparency"), 1);
-	vidrios[1].Draw(shader);
+	vidrios[2].Draw(shader);
 	glBindVertexArray(0);
 
 	// Dibuja el Vidrio para las ventanas
@@ -778,7 +751,7 @@ void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc) {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniform1i(glGetUniformLocation(shader.Program, "transparency"), 1);
-	vidrios[2].Draw(shader);
+	vidrios[3].Draw(shader);
 	glBindVertexArray(0);
 
 	glDisable(GL_BLEND);  //Desactiva el canal alfa 
@@ -789,15 +762,15 @@ void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Mod
 	float speed = 1.0f; // Velocidad de órbita
 	float speedWings = 3.0f;
 	float amplWings = 2.0f;
-	// Cálculo de la posición (Trayectoria Circular)
+	// Cálculo de la trayectoria Circular
 	float posX = cos(tiempo * speed) * radio;
 	float posZ = sin(tiempo * speed) * radio;
 
-	// Calculamos el ángulo de rotación para que el pájaro mire al frente mientras gira
+	// Calculo del ángulo de rotación para que el pájaro mire al frente mientras gira
 	float rotacionY = -tiempo * speed;
 	//Calcula el ángulo del aleteo de las alas
 	float angleWings = sin(tiempo * speedWings) * amplWings;
-	// Matriz base (Padre)
+	// Matriz Padre: cuerpo
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, centro + glm::vec3(posX, 0.0f, posZ));
 	model = glm::rotate(model, rotacionY, glm::vec3(0.0f, 1.0f, 0.0f));
@@ -898,14 +871,14 @@ void DibujarFlor(Shader& shader, GLint modelLoc, Model& modeloFlor, glm::vec3 po
 
 void AnimarPersonaje(Shader& shader, GLint modelLoc, Model& piernas, Model& torso, glm::vec3 posicion, float escala, float tiempo)
 {
-	// 1. Configuración de la Animación
-	float velocidadBusqueda = 2.0f; // Qué tan rápido mueve la cabeza/torso
-	float amplitudGiro = 45.0f;     // Cuántos grados gira hacia cada lado
+	// variables de animación
+	float velocidadBusqueda = 2.0f; // Rapidez de la cabeza
+	float amplitudGiro = 45.0f;     // Cuántos grados gira
 
-	// Calculamos el ángulo usando SENO para que vaya de derecha a izquierda suavemente
+	// Calculo usando SENO para que vaya de derecha a izquierda suavemente
 	float anguloGiro = sin(tiempo * velocidadBusqueda) * amplitudGiro;
 
-	// 2. Dibujar PIERNAS (Base estática)
+	// Dibujar piernas
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, posicion);
 	model = glm::rotate(model, glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -914,13 +887,8 @@ void AnimarPersonaje(Shader& shader, GLint modelLoc, Model& piernas, Model& tors
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	piernas.Draw(shader);
 
-	// 3. Dibujar TORSO (Animado)
-	// Usamos la misma matriz 'model' para que el torso esté en la misma posición que las piernas
+	// Dibujar torso (Animado)
 	glm::mat4 modelTorso = model;
-
-	// Si el origen del torso en Blender estaba bien puesto en la cintura, esto rotará perfecto.
-	// Si el torso se ve muy abajo o arriba, puedes agregar un translate aquí:
-	// modelTorso = glm::translate(modelTorso, glm::vec3(0.0f, 0.0f, 0.0f)); 
 
 	modelTorso = glm::rotate(modelTorso, glm::radians(anguloGiro), glm::vec3(0.0f, 1.0f, 0.0f)); // Rotar en Y
 
@@ -930,7 +898,7 @@ void AnimarPersonaje(Shader& shader, GLint modelLoc, Model& piernas, Model& tors
 
 void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& parteDelantera, glm::vec3 posicion, float escala, float tiempo)
 {
-	// --- CONFIGURACIÓN ---
+	// Variables
 	float velocidad = 2.0f;
 	float anguloLevantamientoMax = 30.0f;
 	float anguloGiroMax = 90.0f;
@@ -942,25 +910,23 @@ void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& p
 	// Pivote (Patas traseras)
 	glm::vec3 puntoPivote = glm::vec3(0.0f, -1.0f, 1.5f);
 
-	// --- MATRIZ ---
 	glm::mat4 model = glm::mat4(1.0f);
 
-	// 1. Posición en el mundo
+	// Posición
 	model = glm::translate(model, posicion);
 
-	// 2. Giro Global (Y)
+	// Giro
 	model = glm::rotate(model, glm::radians(giro), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// 3. ESCALA (Aplicada antes de la lógica del pivote)
-	model = glm::scale(model, glm::vec3(escala)); // <--- NUEVO: Aquí cambiamos el tamaño
+	// Escala
+	model = glm::scale(model, glm::vec3(escala)); 
 
-	// 4. Lógica del Pivote y Encabritamiento (X)
-	// Al escalar antes, la distancia al pivote también se escala automáticamente.
+	// Lógica del Pivote y Encabritamiento (X)
 	model = glm::translate(model, puntoPivote);
 	model = glm::rotate(model, glm::radians(encabritado), glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::translate(model, -puntoPivote);
 
-	// --- DIBUJAR ---
+	// Dibujar
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	parteTrasera.Draw(shader);
 
@@ -968,58 +934,54 @@ void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& p
 	parteDelantera.Draw(shader);
 }
 
-void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
-	Model& legFL, Model& legFR, Model& legBL, Model& legBR,
-	glm::vec3 posicionOriginal, float escala, float tiempo)
+void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head, Model& legFL, Model& legFR, Model& legBL, Model& legBR, glm::vec3 posicionOriginal, float escala, float tiempo)
 {
-	// --- VARIABLES DE CONFIGURACIÓN ---
+	// Variables
 	float velocidadCaminata = 4.0f;
 	float distanciaRecorrido = 10.0f;
 
 	float ajusteRotacion = 270.0f;
 
-	// --- 1. LÓGICA DE TIEMPOS (CICLO EXTENDIDO) ---
-	// Aumentamos el ciclo a 14 segundos para dar tiempo a "Buscar"
+	// Control de los tiempos
 	float tiempoCiclo = fmod(tiempo, 14.0f);
 
 	glm::vec3 posActual = posicionOriginal;
 	float rotacionY = 0.0f;      // Rotación del cuerpo
-	float rotacionCabeza = 0.0f; // Rotación INDEPENDIENTE de la cabeza (buscar)
+	float rotacionCabeza = 0.0f; // Rotación de la cabeza (independiente)
 	bool moviendoPatas = false;
 
 	// --- MÁQUINA DE ESTADOS ---
 
-	// FASE 1: CAMINAR (IDA) [0s - 4s]
+	// 1: Caminata (ida) [0s - 4s]
 	if (tiempoCiclo < 4.0f)
 	{
 		float factor = tiempoCiclo / 4.0f;
 		posActual.x += factor * distanciaRecorrido; // Avanza en X
 		rotacionY = 0.0f;
 		moviendoPatas = true;
-		// Cabeza firme con ligero bamboleo natural
 		rotacionCabeza = sin(tiempo * 2.0f) * 5.0f;
 	}
-	// FASE 2: BUSCAR [4s - 6s] -> DETIENE Y MIRA
+	// 2: Busca [4s - 6s] Se detiene pero mueve la cabeza
 	else if (tiempoCiclo < 6.0f)
 	{
-		posActual.x += distanciaRecorrido; // Se mantiene al final
-		rotacionY = 0.0f; // Sigue mirando al frente
+		posActual.x += distanciaRecorrido; 
+		rotacionY = 0.0f;
 		moviendoPatas = false; // Patas quietas
 
-		// ANIMACIÓN DE BÚSQUEDA: La cabeza gira de izquierda a derecha
+		// La cabeza gira de izquierda a derecha
 		float tiempoLocal = tiempoCiclo - 4.0f;
 		rotacionCabeza = sin(tiempoLocal * 3.0f) * 45.0f; // Gira 45 grados a cada lado
 	}
-	// FASE 3: GIRO DE CUERPO [6s - 7s]
+	// 3: Giro para regresar [6s - 7s]
 	else if (tiempoCiclo < 7.0f)
 	{
 		posActual.x += distanciaRecorrido;
 		float factor = (tiempoCiclo - 6.0f); // 0 a 1
 		rotacionY = factor * 180.0f; // Gira 180 grados
-		rotacionCabeza = 0.0f; // Centra la cabeza mientras gira el cuerpo
+		rotacionCabeza = 0.0f; // Centra la cabeza mientras gira
 		moviendoPatas = true; // Marcha en su lugar para girar
 	}
-	// FASE 4: CAMINAR (VUELTA) [7s - 11s]
+	// 4: Regreso [7s - 11s]
 	else if (tiempoCiclo < 11.0f)
 	{
 		float factor = (tiempoCiclo - 7.0f) / 4.0f;
@@ -1029,7 +991,7 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 		moviendoPatas = true;
 		rotacionCabeza = sin(tiempo * 2.0f) * 5.0f;
 	}
-	// FASE 5: BUSCAR (ORIGEN) [11s - 13s] -> MIRA DE NUEVO AL LLEGAR
+	// 5: Busca (origen) [11s - 13s]
 	else if (tiempoCiclo < 13.0f)
 	{
 		posActual.x += 0.0f; // En el origen
@@ -1039,7 +1001,7 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 		float tiempoLocal = tiempoCiclo - 11.0f;
 		rotacionCabeza = sin(tiempoLocal * 3.0f) * 45.0f; // Busca de nuevo
 	}
-	// FASE 6: GIRO FINAL [13s - 14s]
+	// 6: Giro para volver a iniciar [13s - 14s]
 	else
 	{
 		posActual.x += 0.0f;
@@ -1049,13 +1011,13 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 		rotacionCabeza = 0.0f;
 	}
 
-	// --- 2. CÁLCULO DE ARTICULACIONES ---
+	// Rotaciones de patas
 	float rotPata1 = 0.0f;
 	float rotPata2 = 0.0f;
 	float bobbing = 0.0f;
 
 	if (moviendoPatas) {
-		rotPata1 = sin(tiempo * velocidadCaminata) * 5.0f; // Aumenté a 30 para que se note el paso
+		rotPata1 = sin(tiempo * velocidadCaminata) * 3.0f; 
 		rotPata2 = sin(tiempo * velocidadCaminata + 3.14159f) * 5.0f;
 		bobbing = abs(sin(tiempo * velocidadCaminata)) * 0.05f;
 	}
@@ -1064,12 +1026,11 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 		bobbing = sin(tiempo * 2.0f) * 0.02f;
 	}
 
-	// --- 3. DIBUJADO ---
+	// --- DIBUJADO ---
 
-	// Matriz Maestra (Cuerpo)
+	// Matriz Padre: Cuerpo
 	glm::mat4 modelBody = glm::mat4(1.0f);
 	modelBody = glm::translate(modelBody, posActual);
-	// Rotación combinada: La lógica de ida/vuelta + el ajuste para que no camine de lado
 	modelBody = glm::rotate(modelBody, glm::radians(rotacionY + ajusteRotacion), glm::vec3(0.0f, 1.0f, 0.0f));
 	modelBody = glm::translate(modelBody, glm::vec3(0.0f, bobbing, 0.0f));
 	modelBody = glm::scale(modelBody, glm::vec3(escala));
@@ -1077,8 +1038,7 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelBody));
 	body.Draw(shader);
 
-	// --- JOINTS (Pivotes) ---
-	// Asegúrate que estos valores coincidan con tu modelo
+	// Pivotes
 	float offX = 0.15f;
 	float offY = 0.4f;
 	float offZ_F = 0.4f;
@@ -1089,22 +1049,18 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	glm::vec3 pBL = glm::vec3(offX, offY, offZ_B);
 	glm::vec3 pBR = glm::vec3(-offX, offY, offZ_B);
 
-	// Pivote del cuello (IMPORTANTE: Ajustar altura y profundidad para que la cabeza no flote)
+	// Pivote del cuello
 	glm::vec3 pHead = glm::vec3(0.0f, 0.6f, 0.6f);
 
-	// --- DIBUJAR CABEZA (CORREGIDO) ---
+	// CABEZA
 	glm::mat4 mHead = modelBody;
-	// 2. Aplicar la rotación de "Búsqueda" (Izquierda/Derecha)
-	mHead = glm::rotate(mHead, glm::radians(rotacionCabeza), glm::vec3(0.0f, 1.0f, 0.0f));
-	// 3. Regresar del pivote (opcional, depende del origen del modelo de la cabeza)
-	// Si la cabeza rota sobre su base, no necesitas el translate negativo. 
-	
-
+	// Búsqueda
+	mHead = glm::rotate(mHead, glm::radians(rotacionCabeza), glm::vec3(0.0f, 1.0f, 0.0f));	
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mHead));
 	head.Draw(shader);
 
-	// --- DIBUJAR PATAS ---
-	// FL
+	// PATAS
+	// Frontal izquierda
 	glm::mat4 mFL = modelBody;
 	mFL = glm::translate(mFL, pFL);
 	mFL = glm::rotate(mFL, glm::radians(rotPata1), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -1112,7 +1068,7 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mFL));
 	legFL.Draw(shader);
 
-	// FR
+	// Frontal derecha
 	glm::mat4 mFR = modelBody;
 	mFR = glm::translate(mFR, pFR);
 	mFR = glm::rotate(mFR, glm::radians(rotPata2), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -1120,7 +1076,7 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mFR));
 	legFR.Draw(shader);
 
-	// BL
+	// Trasera izquierda
 	glm::mat4 mBL = modelBody;
 	mBL = glm::translate(mBL, pBL);
 	mBL = glm::rotate(mBL, glm::radians(rotPata2), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -1128,7 +1084,7 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mBL));
 	legBL.Draw(shader);
 
-	// BR
+	// Trasera derecha
 	glm::mat4 mBR = modelBody;
 	mBR = glm::translate(mBR, pBR);
 	mBR = glm::rotate(mBR, glm::radians(rotPata1), glm::vec3(1.0f, 0.0f, 0.0f));
@@ -1140,26 +1096,25 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 void AnimarHelicoptero(Shader& shader, GLint modelLoc, Model& cuerpo, Model& helice, glm::vec3 pos, float escala, float tiempo)
 {
 	// Variables
-	float velocidadHélice = 20.0f; // Muy rápido
+	float velocidadHélice = 20.0f; 
 	float velocidadLevitacion = 2.0f;
 
-	// Levitación suave (Sube y baja)
+	// Levitación suave
 	float posY = pos.y + sin(tiempo * velocidadLevitacion) * 0.5f;
 
-	// 1. DIBUJAR CUERPO
+	// Cabina
 	glm::mat4 model = glm::mat4(1.0f);
 	model = glm::translate(model, glm::vec3(pos.x, posY, pos.z));
 
-	// Inclinación ligera hacia adelante (como si avanzara un poco)
+	// Inclinación ligera hacia adelante 
 	model = glm::rotate(model, glm::radians(10.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 	model = glm::scale(model, glm::vec3(escala));
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	cuerpo.Draw(shader);
 
-	// 2. DIBUJAR HÉLICE
-	// Asumiendo que el origen de la hélice está en su centro
-	glm::mat4 modelH = model; // Copiamos la matriz del cuerpo (ya tiene la posición y escala)
+	// Helice
+	glm::mat4 modelH = model; 
 	modelH = glm::rotate(modelH, tiempo * velocidadHélice, glm::vec3(0.0f, 1.0f, 0.0f));
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelH));
@@ -1168,53 +1123,47 @@ void AnimarHelicoptero(Shader& shader, GLint modelLoc, Model& cuerpo, Model& hel
 
 void AnimarAvionInfinito(Shader& shader, GLint modelLoc, Model& modeloAvion, glm::vec3 centro, float radio, float escala, float tiempo)
 {
-	// --- CONFIGURACIÓN ---
 	float velocidad = 1.0f; // Velocidad de recorrido
 
-	// 1. CÁLCULO DE LA POSICIÓN (TRAYECTORIA EN 8)
-	// Ecuación paramétrica de la Lemniscata (Figura 8)
+	// 1. Calculo de la posicion
+	// Ecuación paramétrica de la Lemniscata 
 	// X se mueve con cos(t), Z se mueve con sin(2*t) para hacer el cruce
 	float t = tiempo * velocidad;
 
 	float x = centro.x + (radio * cos(t));
-	float z = centro.z + (radio * sin(2.0f * t) / 2.0f); // Dividimos entre 2 para que el 8 sea proporcional
+	float z = centro.z + (radio * sin(2.0f * t) / 2.0f); // se divide entre 2 para que el 8 sea proporcional
 
-	// Agregamos una leve variación en Y para que no vuele plano
+	// se agrega una leve variación en Y para que no vuele plano
 	float y = centro.y + (sin(t * 2.0f) * 1.0f);
 
-	// 2. CÁLCULO DE LA ORIENTACIÓN (YAW - Rumbo)
-	// Para que el avión mire al frente, necesitamos la derivada (velocidad) de la posición
-	// Derivada de cos(t) es -sin(t)
-	// Derivada de sin(2t) es 2*cos(2t)
+	// 2. Orientacion del avion(YAW - Rumbo)
+	// Para que el avión mire al frente, se necesita
+	// la derivada (velocidad) de la posición
+	// Derivada de cos(t) = -sin(t)
+	// Derivada de sin(2t) = 2*cos(2t)
 	float dx = -sin(t);
 	float dz = cos(2.0f * t);
 
-	// atan2 nos da el ángulo en radianes desde el vector (0,0) al vector (dx,dz)
+	// atan2 nos da el angulo en radianes desde (0,0) -> (dx,dz)
 	float anguloY = atan2(dx, dz);
-	// Convertimos a grados
+	// Conversion radianes a grados
 	float gradosY = glm::degrees(anguloY);
 
-	// 3. CÁLCULO DEL ALABEO (ROLL - Inclinación)
+	// Orientacion (inclinacion)
 	// El avión debe inclinarse hacia adentro de la curva.
-	// Usamos la curvatura o simplemente sincronizamos con el giro.
-	// En un 8, el giro cambia de izquierda a derecha, así que cos(t) funciona bien para simular esto.
+	// En un infinito, el giro cambia de izquierda a derecha
 	float anguloRoll = cos(t) * 45.0f; // 45 grados de inclinación máxima
 
-	// --- CONSTRUCCIÓN DE LA MATRIZ ---
 	glm::mat4 model = glm::mat4(1.0f);
 
-	// A. Posición
+	// Posición
 	model = glm::translate(model, glm::vec3(x, y, z));
 
-	// B. Orientación (Rumbo/Yaw)
-	// Sumamos 90, 180 o 270 si el modelo viene rotado por defecto.
-	// Prueba sumando +180.0f o +90.0f si vuela de lado o de reversa.
+	// Orientación (Rumbo)
 	model = glm::rotate(model, glm::radians(gradosY), glm::vec3(0.0f, 1.0f, 0.0f));
 
-	// C. Inclinación (Roll)
-	// Importante: Rotamos en el eje Z (o X) local para el alabeo
-	model = glm::rotate(model, glm::radians(anguloRoll), glm::vec3(0.0f, 0.0f, 1.0f)); // Eje X si el avión apunta en Z, o Z si apunta en X
-	// NOTA: Si el avión gira raro (como un taladro), cambia este eje a (0,0,1)
+	// Orientacion (inclinacion)
+	model = glm::rotate(model, glm::radians(anguloRoll), glm::vec3(0.0f, 0.0f, 1.0f));
 
 	model = glm::scale(model, glm::vec3(escala));
 
@@ -1222,10 +1171,37 @@ void AnimarAvionInfinito(Shader& shader, GLint modelLoc, Model& modeloAvion, glm
 	modeloAvion.Draw(shader);
 }
 
+void AnimarHacha(Shader& shader, GLint modelLoc, Model& modeloEspada, glm::vec3 posicion, float escala, float tiempo)
+{
+	// Variables
+	float velocidadGiro = 50.0f; 
+	float velocidadFlote = 2.0f;  
+	float alturaFlote = 0.3f;     
+
+	// Levitacion (Eje Y)
+	float floteY = sin(tiempo * velocidadFlote) * alturaFlote;
+
+	// Rotación (Eje Y)
+	float rotacionY = tiempo * velocidadGiro;
+
+	glm::mat4 model = glm::mat4(1.0f);
+
+	//Posicion
+	model = glm::translate(model, posicion + glm::vec3(0.0f, floteY, 0.0f));
+
+	// Rotacion
+	model = glm::rotate(model, glm::radians(rotacionY), glm::vec3(0.0f, 1.0f, 0.0f));
+	// Escala
+	model = glm::scale(model, glm::vec3(escala));
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	modeloEspada.Draw(shader);
+}
+
+
 void Animacion_Camara(GLfloat deltaTime) {
 
 	if (recorrido_automatico == true) {
-		//Implementar aqui la animacion de la camara
 		interpolation(deltaTime);
 	}
 }
