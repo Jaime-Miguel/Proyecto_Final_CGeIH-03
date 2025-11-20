@@ -28,6 +28,7 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
+GLuint LoadTextureFromFile(const char* path);
 // Funciones creadas
 //Dibuja las ventanas de diferentes edificios.
 void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc); 
@@ -37,6 +38,9 @@ void AnimarPajaro(Shader& shader, GLint modelLoc, Model& body, Model& wingR, Mod
 void AnimarQuetzal(Shader& shader, GLint modelLoc, Model& body, Model& head, Model& tail, glm::vec3 posicion, bool animar, float time);
 // Animacion basica de chica perdida
 void AnimarPersonaje(Shader& shader, GLint modelLoc, Model& piernas, Model& torso, glm::vec3 posicion, float escala, float tiempo);
+// Animacion de fotogrago
+//void AnimarFotografo(Shader& shader, GLint modelLoc, Model& base, Model& cabeza, glm::vec3 posicion, float escala, float tiempo);
+void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& parteDelantera, glm::vec3 posicion, float escala, float tiempo);
 
 // Dibuja un objeto compuesto por dos partes (ej. tronco y hojas)
 void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala);
@@ -44,6 +48,9 @@ void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas,
 void DibujarArbol(Shader& shader, GLint modelLoc, Model& arbol, Model& hoja, glm::vec3 posicion, float angulo);
 // Dibuja el modelo de flores con su rotación específica
 void DibujarFlor(Shader& shader, GLint modelLoc, Model& modeloFlor, glm::vec3 posicion, float escala, float angulo);
+
+
+
 // Window dimensions
 const GLuint WIDTH = 1200, HEIGHT = 800;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
@@ -134,6 +141,7 @@ glm::vec3 Light1 = glm::vec3(0);
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 
+
 int main()
 {
 	// Init GLFW
@@ -191,7 +199,7 @@ int main()
 	};
 
 	Model Ball((char*)"Models/ball.obj");
-	Model Patio_Principal((char*)"Models/Patio_Principal.obj");
+	Model MuseoAnahuacalli((char*)"Models/Museo_Anahuacalli.obj");
 	Model Cesped((char*)"Models/Cesped.obj");
 	Model Cuadro01((char*)"Models/Cuadro1.obj");
 	Model Cuadro02((char*)"Models/Cuadro2.obj");
@@ -216,6 +224,13 @@ int main()
 	// Chica perdida
 	Model girlB((char*)"Models/lostGirlBody.obj");
 	Model girlL((char*)"Models/lostGirlLegs.obj");
+	// Fotografo
+	//Model photoB((char*)"Models/photoBody.obj");
+	//Model photoL((char*)"Models/photoLegs.obj");
+	//GLuint texturaPhoto = LoadTextureFromFile("Models/rqnger-tex.jpg");
+	Model horseB((char*)"Models/horseB.obj");
+	Model horseF((char*)"Models/horseF.obj");
+
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
 	glGenVertexArrays(1, &VAO);
@@ -268,7 +283,7 @@ int main()
 		// Use cooresponding shader when setting uniforms/drawing objects
 		lightingShader.Use();
 
-		glUniform1i(glGetUniformLocation(lightingShader.Program, "diffuse"), 0);
+		glUniform1i(glGetUniformLocation(lightingShader.Program, "texture_diffuse1"), 0);
 		//glUniform1i(glGetUniformLocation(lightingShader.Program, "specular"),1);
 
 		GLint viewPosLoc = glGetUniformLocation(lightingShader.Program, "viewPos");
@@ -331,10 +346,19 @@ int main()
 		float radio = 2.0f;
 		glm::vec3 posicionQ = glm::vec3(17.0f, -3.0f, -62.0f);
 		glm::vec3 girlPos = glm::vec3(-4.0f, 7.5f, -30.0f);
-		
+		glm::vec3 photoPos = glm::vec3(0.0f, 0.0f, 0.0f);
+		glm::vec3 posCaballo = glm::vec3(19.0f, 0.0f, -80.0f);
+
 		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
 		AnimarQuetzal(lightingShader, modelLoc, quetzalB, quetzalH, quetzalT, posicionQ, true,currentFrame);
 		AnimarPersonaje(lightingShader, modelLoc, girlL, girlB, girlPos, 0.6f, currentFrame);
+		AnimarCaballo(lightingShader, modelLoc, horseB, horseF, posCaballo, 2.0f, currentFrame);
+
+
+
+		
+		
+
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -30.0f), 0.5);
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -40.0f), 0.5);
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -50.0f), 0.5);
@@ -384,7 +408,7 @@ int main()
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
-		Patio_Principal.Draw(lightingShader);
+		MuseoAnahuacalli.Draw(lightingShader);
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
@@ -821,4 +845,79 @@ void AnimarPersonaje(Shader& shader, GLint modelLoc, Model& piernas, Model& tors
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTorso));
 	torso.Draw(shader);
+}
+
+void AnimarFotografo(Shader& shader, GLint modelLoc, Model& base, Model& cabeza, glm::vec3 posicion, float escala, float tiempo)
+{
+	// 1. Configuración del movimiento
+	float velocidad = 2.0f;     // Qué tan rápido sube y baja
+	float alturaLevitacion = 0.5f; // Qué tanto se separa de la base (amplitud)
+
+	// Ajuste de altura inicial:
+	// Si la cabeza aparece enterrada en el trípode, aumenta este valor.
+	float alturaBase = 0.0f;
+
+	// Cálculo del desplazamiento en Y
+	// Usamos 'abs(sin)' si queremos que solo suba y vuelva a 0, 
+	// o solo 'sin' si queremos que suba y baje pasando por el centro.
+	// Probemos con 'sin' simple primero:
+	float desplazamientoX = sin(tiempo * velocidad) * alturaLevitacion;
+
+	// 2. Dibujar la BASE (Estática)
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, posicion);
+	model = glm::scale(model, glm::vec3(escala));
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	base.Draw(shader);
+
+	// 3. Dibujar la CABEZA (Animada)
+	glm::mat4 modelCabeza = model; // Copiamos la posición de la base
+
+	// APLICAR ANIMACIÓN: Traslación en el eje Y (Arriba/Abajo)
+	// Sumamos 'alturaBase' por si el modelo necesita estar más arriba por defecto
+	modelCabeza = glm::translate(modelCabeza, glm::vec3(0.0f, alturaBase + desplazamientoX, 0.0f));
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelCabeza));
+	cabeza.Draw(shader);
+}
+
+void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& parteDelantera, glm::vec3 posicion, float escala, float tiempo)
+{
+	// --- CONFIGURACIÓN ---
+	float velocidad = 2.0f;
+	float anguloLevantamientoMax = 30.0f;
+	float anguloGiroMax = 90.0f;
+
+	// Lógica de movimiento (Seno y Coseno)
+	float encabritado = abs(sin(tiempo * velocidad)) * anguloLevantamientoMax;
+	float giro = abs(sin(tiempo * velocidad * 0.5f)) * anguloGiroMax;
+
+	// Pivote (Patas traseras)
+	glm::vec3 puntoPivote = glm::vec3(0.0f, -1.0f, 1.5f);
+
+	// --- MATRIZ ---
+	glm::mat4 model = glm::mat4(1.0f);
+
+	// 1. Posición en el mundo
+	model = glm::translate(model, posicion);
+
+	// 2. Giro Global (Y)
+	model = glm::rotate(model, glm::radians(giro), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	// 3. ESCALA (Aplicada antes de la lógica del pivote)
+	model = glm::scale(model, glm::vec3(escala)); // <--- NUEVO: Aquí cambiamos el tamaño
+
+	// 4. Lógica del Pivote y Encabritamiento (X)
+	// Al escalar antes, la distancia al pivote también se escala automáticamente.
+	model = glm::translate(model, puntoPivote);
+	model = glm::rotate(model, glm::radians(encabritado), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::translate(model, -puntoPivote);
+
+	// --- DIBUJAR ---
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	parteTrasera.Draw(shader);
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	parteDelantera.Draw(shader);
 }
