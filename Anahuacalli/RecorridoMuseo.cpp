@@ -41,7 +41,10 @@ void AnimarPersonaje(Shader& shader, GLint modelLoc, Model& piernas, Model& tors
 // Animacion de fotogrago
 //void AnimarFotografo(Shader& shader, GLint modelLoc, Model& base, Model& cabeza, glm::vec3 posicion, float escala, float tiempo);
 void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& parteDelantera, glm::vec3 posicion, float escala, float tiempo);
-
+// Animacion de gato
+void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
+	Model& legFL, Model& legFR, Model& legBL, Model& legBR,
+	glm::vec3 posicion, float escala, float tiempo);
 // Dibuja un objeto compuesto por dos partes (ej. tronco y hojas)
 void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala);
 // Dibuja un solo arbol
@@ -224,12 +227,16 @@ int main()
 	// Chica perdida
 	Model girlB((char*)"Models/lostGirlBody.obj");
 	Model girlL((char*)"Models/lostGirlLegs.obj");
-	// Fotografo
-	//Model photoB((char*)"Models/photoBody.obj");
-	//Model photoL((char*)"Models/photoLegs.obj");
-	//GLuint texturaPhoto = LoadTextureFromFile("Models/rqnger-tex.jpg");
+	// Caballo
 	Model horseB((char*)"Models/horseB.obj");
 	Model horseF((char*)"Models/horseF.obj");
+	//Gato
+	Model catB((char*)"Models/catBody.obj");
+	Model catH((char*)"Models/catHead.obj");
+	Model catFR((char*)"Models/catFR.obj");
+	Model catFL((char*)"Models/catFL.obj");
+	Model catBR((char*)"Models/catBR.obj");
+	Model catBL((char*)"Models/catBL.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -346,13 +353,17 @@ int main()
 		float radio = 2.0f;
 		glm::vec3 posicionQ = glm::vec3(17.0f, -3.0f, -62.0f);
 		glm::vec3 girlPos = glm::vec3(-4.0f, 7.5f, -30.0f);
-		glm::vec3 photoPos = glm::vec3(0.0f, 0.0f, 0.0f);
 		glm::vec3 posCaballo = glm::vec3(19.0f, 0.0f, -80.0f);
+		glm::vec3 posGato = glm::vec3(15.0f, 0.0f, -15.0f);
 
 		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
 		AnimarQuetzal(lightingShader, modelLoc, quetzalB, quetzalH, quetzalT, posicionQ, true,currentFrame);
 		AnimarPersonaje(lightingShader, modelLoc, girlL, girlB, girlPos, 0.6f, currentFrame);
 		AnimarCaballo(lightingShader, modelLoc, horseB, horseF, posCaballo, 2.0f, currentFrame);
+
+		
+		// Escala 1.0f (o hazlo más pequeño con 0.01f si tu modelo es gigante)
+		AnimarGato(lightingShader, modelLoc, catB, catH, catFL, catFR, catBL, catBR, posGato, 4.0f, currentFrame);
 
 
 
@@ -402,7 +413,7 @@ int main()
 		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(15.0f, 0.5f, -4.0f), 0.5f, 90.0f);
 		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(-3.0f, 0.5f, -4.0f), 0.5f, 90.0f);
 		
-		//Se dibuja el patio central
+		//Se dibuja el Museo completo
 		model = glm::mat4(1);
 		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -847,41 +858,6 @@ void AnimarPersonaje(Shader& shader, GLint modelLoc, Model& piernas, Model& tors
 	torso.Draw(shader);
 }
 
-void AnimarFotografo(Shader& shader, GLint modelLoc, Model& base, Model& cabeza, glm::vec3 posicion, float escala, float tiempo)
-{
-	// 1. Configuración del movimiento
-	float velocidad = 2.0f;     // Qué tan rápido sube y baja
-	float alturaLevitacion = 0.5f; // Qué tanto se separa de la base (amplitud)
-
-	// Ajuste de altura inicial:
-	// Si la cabeza aparece enterrada en el trípode, aumenta este valor.
-	float alturaBase = 0.0f;
-
-	// Cálculo del desplazamiento en Y
-	// Usamos 'abs(sin)' si queremos que solo suba y vuelva a 0, 
-	// o solo 'sin' si queremos que suba y baje pasando por el centro.
-	// Probemos con 'sin' simple primero:
-	float desplazamientoX = sin(tiempo * velocidad) * alturaLevitacion;
-
-	// 2. Dibujar la BASE (Estática)
-	glm::mat4 model = glm::mat4(1.0f);
-	model = glm::translate(model, posicion);
-	model = glm::scale(model, glm::vec3(escala));
-
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	base.Draw(shader);
-
-	// 3. Dibujar la CABEZA (Animada)
-	glm::mat4 modelCabeza = model; // Copiamos la posición de la base
-
-	// APLICAR ANIMACIÓN: Traslación en el eje Y (Arriba/Abajo)
-	// Sumamos 'alturaBase' por si el modelo necesita estar más arriba por defecto
-	modelCabeza = glm::translate(modelCabeza, glm::vec3(0.0f, alturaBase + desplazamientoX, 0.0f));
-
-	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelCabeza));
-	cabeza.Draw(shader);
-}
-
 void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& parteDelantera, glm::vec3 posicion, float escala, float tiempo)
 {
 	// --- CONFIGURACIÓN ---
@@ -920,4 +896,175 @@ void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& p
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	parteDelantera.Draw(shader);
+}
+
+void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
+	Model& legFL, Model& legFR, Model& legBL, Model& legBR,
+	glm::vec3 posicionOriginal, float escala, float tiempo)
+{
+	// --- VARIABLES DE CONFIGURACIÓN ---
+	float velocidadCaminata = 4.0f;
+	float distanciaRecorrido = 10.0f;
+
+	float ajusteRotacion = 270.0f;
+
+	// --- 1. LÓGICA DE TIEMPOS (CICLO EXTENDIDO) ---
+	// Aumentamos el ciclo a 14 segundos para dar tiempo a "Buscar"
+	float tiempoCiclo = fmod(tiempo, 14.0f);
+
+	glm::vec3 posActual = posicionOriginal;
+	float rotacionY = 0.0f;      // Rotación del cuerpo
+	float rotacionCabeza = 0.0f; // Rotación INDEPENDIENTE de la cabeza (buscar)
+	bool moviendoPatas = false;
+
+	// --- MÁQUINA DE ESTADOS ---
+
+	// FASE 1: CAMINAR (IDA) [0s - 4s]
+	if (tiempoCiclo < 4.0f)
+	{
+		float factor = tiempoCiclo / 4.0f;
+		posActual.x += factor * distanciaRecorrido; // Avanza en X
+		rotacionY = 0.0f;
+		moviendoPatas = true;
+		// Cabeza firme con ligero bamboleo natural
+		rotacionCabeza = sin(tiempo * 2.0f) * 5.0f;
+	}
+	// FASE 2: BUSCAR (DESTINO) [4s - 6s] -> AQUÍ SE DETIENE Y MIRA
+	else if (tiempoCiclo < 6.0f)
+	{
+		posActual.x += distanciaRecorrido; // Se mantiene al final
+		rotacionY = 0.0f; // Sigue mirando al frente
+		moviendoPatas = false; // Patas quietas
+
+		// ANIMACIÓN DE BÚSQUEDA: La cabeza gira de izquierda a derecha
+		// Usamos el tiempo local de esta fase (0 a 2s)
+		float tiempoLocal = tiempoCiclo - 4.0f;
+		rotacionCabeza = sin(tiempoLocal * 3.0f) * 45.0f; // Gira 45 grados a cada lado
+	}
+	// FASE 3: GIRO DE CUERPO [6s - 7s]
+	else if (tiempoCiclo < 7.0f)
+	{
+		posActual.x += distanciaRecorrido;
+		float factor = (tiempoCiclo - 6.0f); // 0 a 1
+		rotacionY = factor * 180.0f; // Gira 180 grados
+		rotacionCabeza = 0.0f; // Centra la cabeza mientras gira el cuerpo
+		moviendoPatas = true; // Marcha en su lugar para girar
+	}
+	// FASE 4: CAMINAR (VUELTA) [7s - 11s]
+	else if (tiempoCiclo < 11.0f)
+	{
+		float factor = (tiempoCiclo - 7.0f) / 4.0f;
+		float regreso = distanciaRecorrido * (1.0f - factor);
+		posActual.x += regreso;
+		rotacionY = 180.0f; // Mira hacia atrás
+		moviendoPatas = true;
+		rotacionCabeza = sin(tiempo * 2.0f) * 5.0f;
+	}
+	// FASE 5: BUSCAR (ORIGEN) [11s - 13s] -> MIRA DE NUEVO AL LLEGAR
+	else if (tiempoCiclo < 13.0f)
+	{
+		posActual.x += 0.0f; // En el origen
+		rotacionY = 180.0f;
+		moviendoPatas = false;
+
+		float tiempoLocal = tiempoCiclo - 11.0f;
+		rotacionCabeza = sin(tiempoLocal * 3.0f) * 45.0f; // Busca de nuevo
+	}
+	// FASE 6: GIRO FINAL [13s - 14s]
+	else
+	{
+		posActual.x += 0.0f;
+		float factor = (tiempoCiclo - 13.0f);
+		rotacionY = 180.0f + (factor * 180.0f); // Completa la vuelta a 360
+		moviendoPatas = true;
+		rotacionCabeza = 0.0f;
+	}
+
+	// --- 2. CÁLCULO DE ARTICULACIONES ---
+	float rotPata1 = 0.0f;
+	float rotPata2 = 0.0f;
+	float bobbing = 0.0f;
+
+	if (moviendoPatas) {
+		rotPata1 = sin(tiempo * velocidadCaminata) * 5.0f; // Aumenté a 30 para que se note el paso
+		rotPata2 = sin(tiempo * velocidadCaminata + 3.14159f) * 5.0f;
+		bobbing = abs(sin(tiempo * velocidadCaminata)) * 0.05f;
+	}
+	else {
+		// Respiración cuando está parado buscando
+		bobbing = sin(tiempo * 2.0f) * 0.02f;
+	}
+
+	// --- 3. DIBUJADO ---
+
+	// Matriz Maestra (Cuerpo)
+	glm::mat4 modelBody = glm::mat4(1.0f);
+	modelBody = glm::translate(modelBody, posActual);
+	// Rotación combinada: La lógica de ida/vuelta + el ajuste para que no camine de lado
+	modelBody = glm::rotate(modelBody, glm::radians(rotacionY + ajusteRotacion), glm::vec3(0.0f, 1.0f, 0.0f));
+	modelBody = glm::translate(modelBody, glm::vec3(0.0f, bobbing, 0.0f));
+	modelBody = glm::scale(modelBody, glm::vec3(escala));
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelBody));
+	body.Draw(shader);
+
+	// --- JOINTS (Pivotes) ---
+	// Asegúrate que estos valores coincidan con tu modelo
+	float offX = 0.15f;
+	float offY = 0.4f;
+	float offZ_F = 0.4f;
+	float offZ_B = -0.4f;
+
+	glm::vec3 pFL = glm::vec3(offX, offY, offZ_F);
+	glm::vec3 pFR = glm::vec3(-offX, offY, offZ_F);
+	glm::vec3 pBL = glm::vec3(offX, offY, offZ_B);
+	glm::vec3 pBR = glm::vec3(-offX, offY, offZ_B);
+
+	// Pivote del cuello (IMPORTANTE: Ajustar altura y profundidad para que la cabeza no flote)
+	glm::vec3 pHead = glm::vec3(0.0f, 0.6f, 0.6f);
+
+	// --- DIBUJAR CABEZA (CORREGIDO) ---
+	glm::mat4 mHead = modelBody;
+	// 2. Aplicar la rotación de "Búsqueda" (Izquierda/Derecha)
+	mHead = glm::rotate(mHead, glm::radians(rotacionCabeza), glm::vec3(0.0f, 1.0f, 0.0f));
+	// 3. Regresar del pivote (opcional, depende del origen del modelo de la cabeza)
+	// Si la cabeza rota sobre su base, no necesitas el translate negativo. 
+	// Si rota raro, descomenta la siguiente línea:
+	// mHead = glm::translate(mHead, -pHead); 
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mHead));
+	head.Draw(shader);
+
+	// --- DIBUJAR PATAS ---
+	// FL
+	glm::mat4 mFL = modelBody;
+	mFL = glm::translate(mFL, pFL);
+	mFL = glm::rotate(mFL, glm::radians(rotPata1), glm::vec3(1.0f, 0.0f, 0.0f));
+	mFL = glm::translate(mFL, -pFL);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mFL));
+	legFL.Draw(shader);
+
+	// FR
+	glm::mat4 mFR = modelBody;
+	mFR = glm::translate(mFR, pFR);
+	mFR = glm::rotate(mFR, glm::radians(rotPata2), glm::vec3(1.0f, 0.0f, 0.0f));
+	mFR = glm::translate(mFR, -pFR);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mFR));
+	legFR.Draw(shader);
+
+	// BL
+	glm::mat4 mBL = modelBody;
+	mBL = glm::translate(mBL, pBL);
+	mBL = glm::rotate(mBL, glm::radians(rotPata2), glm::vec3(1.0f, 0.0f, 0.0f));
+	mBL = glm::translate(mBL, -pBL);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mBL));
+	legBL.Draw(shader);
+
+	// BR
+	glm::mat4 mBR = modelBody;
+	mBR = glm::translate(mBR, pBR);
+	mBR = glm::rotate(mBR, glm::radians(rotPata1), glm::vec3(1.0f, 0.0f, 0.0f));
+	mBR = glm::translate(mBR, -pBR);
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mBR));
+	legBR.Draw(shader);
 }
