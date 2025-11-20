@@ -726,7 +726,6 @@ void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc) {
 
 	// Dibuja el Vidrio para las ventanas
 	model = glm::mat4(1);
-	model = glm::translate(model, glm::vec3(-16.0f, 0.0f, 0.0f));
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	glUniform1i(glGetUniformLocation(shader.Program, "transparency"), 1);
