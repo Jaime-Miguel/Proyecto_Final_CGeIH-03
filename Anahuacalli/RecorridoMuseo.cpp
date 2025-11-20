@@ -84,13 +84,13 @@ float repetir = 0.0f;
 glm::vec3 centro = glm::vec3(-16.0f, 1.0f, -16.0f);		//Centro del museo
 glm::vec3 eje_rotacion_cuadro = glm::vec3(1.0f, 0.0f, 0.0f);
 glm::mat4 modelTemp(1.0f);
-// Positions of the point lights
-glm::vec3 pointLightPositions[] = {
-	glm::vec3(-15.0f,4.0f, 8.5f),
-	glm::vec3(0.0f,0.0f, 0.0f),
-	glm::vec3(0.0f,0.0f, 0.0f),
-	glm::vec3(0.0f,0.0f, 0.0f)
-};
+// Variables para la animación de la cámara
+bool recorrido_automatico = false;
+float posX_camera = 50.0f;
+float posY_camera = 3.0f;
+float posZ_camera = 5.0f;
+float rot_horizontal = 0.0f;
+float rot_vertical = 0.0f;
 
 glm::vec3 pos_cuadros[] = {
 	glm::vec3(-17.0f, 16.0f, -26.25f),
@@ -251,17 +251,13 @@ glm::vec3 Light1 = glm::vec3(0);
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
 // Variables para la animación de la cámara
-float posX_camera = 50.0f;
-float posY_camera = 3.0f;
-float posZ_camera = 5.0f;
-float rot_horizontal = 0.0f;
-float rot_vertical = 0.0f;
-bool recorrido_automatico = false;
+
+
 
 int indice_frame = 0;
 int total_keyframes = sizeof(frames) / sizeof(frames[0]);
 
-void Reset_Camera_Animation(void) {
+static void Reset_Camera_Animation(void) {
 	posX_camera = frames[0].posX_camera;
 	posY_camera = frames[0].posY_camera;
 	posZ_camera = frames[0].posZ_camera;
@@ -334,7 +330,7 @@ int main()
 	glfwInit();
 	
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Fuentes de luz", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Proyecto Final CGeIH 03", nullptr, nullptr);
 
 	if (nullptr == window)
 	{
@@ -488,15 +484,6 @@ int main()
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.ambient"), 1.0f, 1.0f, 1.0f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.diffuse"), 0.0f, 0.0f, 0.0f);
 		glUniform3f(glGetUniformLocation(lightingShader.Program, "dirLight.specular"), 0.0f, 0.0f, 0.0f);
-
-		// Luz
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].position"), pointLightPositions[0].x, pointLightPositions[0].y, pointLightPositions[0].z);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].ambient"), 0.5f, 0.3f, 0.0f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].diffuse"), 0.1f, 0.05f, 0.0f);
-		glUniform3f(glGetUniformLocation(lightingShader.Program, "pointLights[0].specular"), 0.0f, 0.0f, 0.0f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].constant"), 0.1f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].linear"), 0.045f);
-		glUniform1f(glGetUniformLocation(lightingShader.Program, "pointLights[0].quadratic"), 0.075f);
 
 		// Set material properties
 		glUniform1f(glGetUniformLocation(lightingShader.Program, "material.shininess"), 0.0f);
@@ -652,27 +639,27 @@ void DoMovement()
 			printf("Recorrido automatico desactivado\n");
 		}
 	}
-	if (keys[GLFW_KEY_4])
-	{
-		camera.TeleportAndReset(glm::vec3(-16.7981f, 15.0926f, -27.1761f));
-		camera.SetRotation(91.0f, -0.75f);
-	}
-	if (keys[GLFW_KEY_5]) {
+	// Camara en modelo animado
+	if (keys[GLFW_KEY_4]) {
 		camera.TeleportAndReset(glm::vec3(-13.9923f, 30.1483f, -46.064f));
 		camera.SetRotation(-54.75f, -19.75f);
 	}
+	// Camara en mural
 	if (keys[GLFW_KEY_0]) {
 		camera.SetPosition(pos_cuadros[0]);
 		camera.SetRotation(rotaciones[1], rotaciones[0]);
 	}
+	// Camara en mural boceto
 	if (keys[GLFW_KEY_9]) {
 		camera.SetPosition(pos_cuadros[1]);
 		camera.SetRotation(rotaciones[2], rotaciones[0]);
 	}
+	// Camara en mural abstracto
 	if (keys[GLFW_KEY_8]) {
 		camera.SetPosition(pos_cuadros[2]);
 		camera.SetRotation(rotaciones[3], rotaciones[0]);
 	}
+	// Camara en mural "¡Victoria!"
 	if (keys[GLFW_KEY_7]) {
 		camera.SetPosition(pos_cuadros[3]);
 		camera.SetRotation(rotaciones[3], rotaciones[0]);
