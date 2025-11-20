@@ -45,6 +45,8 @@ void AnimarCaballo(Shader& shader, GLint modelLoc, Model& parteTrasera, Model& p
 void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	Model& legFL, Model& legFR, Model& legBL, Model& legBR,
 	glm::vec3 posicion, float escala, float tiempo);
+// Animacion de helicoptero
+void AnimarHelicoptero(Shader& shader, GLint modelLoc, Model& cuerpo, Model& helice, glm::vec3 pos, float escala, float tiempo);
 // Dibuja un objeto compuesto por dos partes (ej. tronco y hojas)
 void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala);
 // Dibuja un solo arbol
@@ -237,6 +239,11 @@ int main()
 	Model catFL((char*)"Models/catFL.obj");
 	Model catBR((char*)"Models/catBR.obj");
 	Model catBL((char*)"Models/catBL.obj");
+	//Helicoptero
+	Model heliCabin((char*)"Models/heliCabin.obj");
+	Model heliProp((char*)"Models/heliProp.obj");
+	//Avion
+	Model plane((char*)"Models/floatplane.obj");
 
 	// First, set the container's VAO (and VBO)
 	GLuint VBO, VAO;
@@ -349,26 +356,29 @@ int main()
 		glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
+		/*model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-21.0f, 0.0f, -83.0f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		heliCabin.Draw(lightingShader);
+		modelTemp = model;
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTemp));
+		heliProp.Draw(lightingShader);*/
+
+
 		glm::vec3 centroPajaro = glm::vec3(20.0f, 2.0f, -10.0f);
 		float radio = 2.0f;
 		glm::vec3 posicionQ = glm::vec3(17.0f, -3.0f, -62.0f);
 		glm::vec3 girlPos = glm::vec3(-4.0f, 7.5f, -30.0f);
 		glm::vec3 posCaballo = glm::vec3(19.0f, 0.0f, -80.0f);
 		glm::vec3 posGato = glm::vec3(15.0f, 0.0f, -15.0f);
-
+		glm::vec3 posHeli = glm::vec3(-21.0f, 10.0f, -83.0f);
 		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
 		AnimarQuetzal(lightingShader, modelLoc, quetzalB, quetzalH, quetzalT, posicionQ, true,currentFrame);
 		AnimarPersonaje(lightingShader, modelLoc, girlL, girlB, girlPos, 0.6f, currentFrame);
 		AnimarCaballo(lightingShader, modelLoc, horseB, horseF, posCaballo, 2.0f, currentFrame);
-
-		
-		// Escala 1.0f (o hazlo más pequeño con 0.01f si tu modelo es gigante)
 		AnimarGato(lightingShader, modelLoc, catB, catH, catFL, catFR, catBL, catBR, posGato, 4.0f, currentFrame);
+		AnimarHelicoptero(lightingShader, modelLoc, heliCabin, heliProp, posHeli, 1.0f, currentFrame);
 
-
-
-		
-		
 
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -30.0f), 0.5);
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -40.0f), 0.5);
@@ -929,7 +939,7 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 		// Cabeza firme con ligero bamboleo natural
 		rotacionCabeza = sin(tiempo * 2.0f) * 5.0f;
 	}
-	// FASE 2: BUSCAR (DESTINO) [4s - 6s] -> AQUÍ SE DETIENE Y MIRA
+	// FASE 2: BUSCAR [4s - 6s] -> DETIENE Y MIRA
 	else if (tiempoCiclo < 6.0f)
 	{
 		posActual.x += distanciaRecorrido; // Se mantiene al final
@@ -937,7 +947,6 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 		moviendoPatas = false; // Patas quietas
 
 		// ANIMACIÓN DE BÚSQUEDA: La cabeza gira de izquierda a derecha
-		// Usamos el tiempo local de esta fase (0 a 2s)
 		float tiempoLocal = tiempoCiclo - 4.0f;
 		rotacionCabeza = sin(tiempoLocal * 3.0f) * 45.0f; // Gira 45 grados a cada lado
 	}
@@ -1029,8 +1038,7 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	mHead = glm::rotate(mHead, glm::radians(rotacionCabeza), glm::vec3(0.0f, 1.0f, 0.0f));
 	// 3. Regresar del pivote (opcional, depende del origen del modelo de la cabeza)
 	// Si la cabeza rota sobre su base, no necesitas el translate negativo. 
-	// Si rota raro, descomenta la siguiente línea:
-	// mHead = glm::translate(mHead, -pHead); 
+	
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mHead));
 	head.Draw(shader);
@@ -1067,4 +1075,33 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	mBR = glm::translate(mBR, -pBR);
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(mBR));
 	legBR.Draw(shader);
+}
+
+void AnimarHelicoptero(Shader& shader, GLint modelLoc, Model& cuerpo, Model& helice, glm::vec3 pos, float escala, float tiempo)
+{
+	// Variables
+	float velocidadHélice = 20.0f; // Muy rápido
+	float velocidadLevitacion = 2.0f;
+
+	// Levitación suave (Sube y baja)
+	float posY = pos.y + sin(tiempo * velocidadLevitacion) * 0.5f;
+
+	// 1. DIBUJAR CUERPO
+	glm::mat4 model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(pos.x, posY, pos.z));
+
+	// Inclinación ligera hacia adelante (como si avanzara un poco)
+	model = glm::rotate(model, glm::radians(10.0f), glm::vec3(1.0f, 0.0f, 0.0f));
+	model = glm::scale(model, glm::vec3(escala));
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	cuerpo.Draw(shader);
+
+	// 2. DIBUJAR HÉLICE
+	// Asumiendo que el origen de la hélice está en su centro
+	glm::mat4 modelH = model; // Copiamos la matriz del cuerpo (ya tiene la posición y escala)
+	modelH = glm::rotate(modelH, tiempo * velocidadHélice, glm::vec3(0.0f, 1.0f, 0.0f));
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelH));
+	helice.Draw(shader);
 }
