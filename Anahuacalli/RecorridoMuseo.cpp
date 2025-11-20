@@ -54,6 +54,8 @@ void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas,
 void DibujarArbol(Shader& shader, GLint modelLoc, Model& arbol, Model& hoja, glm::vec3 posicion, float angulo);
 // Dibuja el modelo de flores con su rotación específica
 void DibujarFlor(Shader& shader, GLint modelLoc, Model& modeloFlor, glm::vec3 posicion, float escala, float angulo);
+// Animacion de camara por el museo
+void Animacion_Camara(GLfloat deltaTime);
 
 
 
@@ -62,7 +64,7 @@ const GLuint WIDTH = 1200, HEIGHT = 800;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // Camera Inicia en la entrada del museo
-Camera  camera(glm::vec3(50.0f, 3.0f, 45.0f));
+Camera  camera(glm::vec3(48.0f, 2.0f, 5.0f));
 GLfloat lastX = WIDTH / 2.0;
 GLfloat lastY = HEIGHT / 2.0;
 bool keys[1024];
@@ -138,7 +140,89 @@ float vertices[] = {
 	   -0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 };
 
+typedef struct {
+	float posX_camera;
+	float posY_camera;
+	float posZ_camera;
+	float rot_horizontal;
+	float rot_vertical;
+	float time;
+} FRAME_CAMERA;
 
+FRAME_CAMERA frames[] = {
+	//{ 48.0f, 2.0f, 5.0f, 270.0f, 0.0f, 0.0f},	//Entrada Principal
+	//{ 48.0f, 2.0f, -8.0f, 180.0f, 0.0f, 2.0f},	//Rotacion hacia la compra del boleto
+	//{ 20.0f, 2.0f, -8.0f, 180.0f, 0.0f, 3.0f},	//Avanza hacia la compra del boleto
+	//{ 20.0f, 2.0f, -12.0f, 270.0f, 0.0f, 2.0f}, //Avanza por el costado derecho
+	//{ 25.0f, 2.0f, -12.0f, 360.0f, 0.0f, 3.0f},	//Avanza por la orilla y gira a la derecha
+	//{ 30.0f, 2.0f, -12.0f, 270.0f, 0.0f, 3.0f},	//Avanza por la orilla y gira a la izquierda
+	//{ 30.0f, 2.0f, -46.5f, 270.0f, 0.0f, 3.0f}, //Avanzo por enfrente del museo
+	//{ 33.0f, 2.0f, -48.5f, 290.0f, 0.0f, 1.0f}, //Avanza por el primer edifico
+	//{ 33.0f, 2.0f, -50.5f, 270.0f, 0.0f, 2.0f}, //Avanza por el costado primer edifico
+	//{ 33.0f, 2.0f, -70.5f, 270.0f, 0.0f, 3.0f}, //Avanza por el costado del primer edifico
+	//{ 33.0f, 2.0f, -80.0f, 360.0f, 0.0f, 5.0f}, //Avanza mirando el centro del primer edifico
+	//{ 33.0f, 2.0f, -85.0f, 270.0f, 0.0f, 1.0f}, //Avanza retornando la mirada al pasillo principal
+	//{ 33.0f, 2.0f, -98.0f, 180.0f, 0.0f, 2.0f}, //Avanza hasta el final del pasillo y voltea al segundo edificio
+	//{ 15.0f, 2.0f, -98.0f, 180.0f, 0.0f, 3.0f}, //Avanza para el segundo edificio
+	//{ 7.0f, 2.0f, -98.0f, 270.0f, 0.0f, 5.0f},  //Avanza mirando al centro del segundo edificio
+	//{ 1.0f, 2.0f, -98.0f, 180.0f, 0.0f, 1.0f},  //Avanza retornando la vista sobre el pasillo
+	//{ -7.0f, 2.0f, -98.0f, 180.0f, 0.0f, 1.0f},  //Avanza hasta el final del segundo pasillo
+	//{ -7.0f, 2.0f, -110.0f, 225.0f, 0.0f, 2.0f},  //Observa en el mirador
+	//{ -7.0f, 2.0f, -98.0f, 135.0f, 0.0f, 2.0f},  //Observa en el mirador
+	//{ 1.0f, 2.0f, -98.0f, 0.0f, 0.0f, 2.0f},  //Retorna hacia atras
+	//{ 33.0f, 2.0f, -98.0f, 90.0f, 0.0f, 3.0f }, // Regresa por el pasillo volteando hacia la entrada
+	//{33.0f, 2.0f, -50.0f, 180.0f, 0.0f, 3.0f},  // Se acerca a la entrada
+	//{12.0f, 2.0f, -24.0f, 180.0f, 0.0f, 3.0f},	// Se posiciona en la sala izqueirda
+	//{-16.0f, 2.0f, -24.0f, 45.0f, 0.0f, 3.0f},  // Se fija por la sala de la izquierda
+	//{-16.0f, 2.0f, -24.0f, 90.0f, 0.0f, 3.0f},  // Inspecciona lo restante de la sala izquierda
+	//{-15.0f, 2.0f, -35.0, 270.0f, 0.0f, 3.0f},	// Avanza a la entrada de la sala derecha
+	//{-15.0f, 2.0f, -35.0, 180.0f, 0.0f, 3.0f},	// Inspecciona la sala empezando por la izqueirda
+	//{-15.0f, 2.0f, -35.0, 320.0f, 0.0f, 3.0f},	// Inspecciona la sala terminando por la derecha
+	//{-28.0f, 5.0f, -31.0, 180.0f, 15.0f, 3.0f}, // Sube las escaleras
+	//{-29.0, 8.0f, -17.0f, 45.0f, 15.0f, 3.0f},  // Sube las escaleras de la izquierda
+	//{-29.0, 8.0f, -17.0f, 0.0f, 0.0f, 3.0f},	// Coloca bien la vista
+	//{-17.0f, 9.0f, -22.0f, 45.0f, 0.0f, 3.0f},	// Inspecciona la sala donde esta
+	//{-17.0f, 9.0f, -22.0f, 90.0f, 0.0f, 3.0f},  // termina de inspeccionar la sala
+	{-17.0f, 9.0f, -22.0f, 270.0f, 0.0f, 3.0f}, // Se pasa a la segunda sala del segundo piso
+	{-20.0f, 9.0f, -34.0f, 320.0f, 0.0f, 3.0f}, // Insecciona la segunda sala
+	{-20.0f, 9.0f, -34.0f, 180.0f, 0.0f, 3.0f}, // Termina de inspeccionar la sala;
+	{-33.0f, 9.0f, -17.0f, 180.0f, 0.0f, 3.0f}, // Se pasa a la sala más chica
+	{-33.0f, 9.0f, -27.0f, 145.0f, 0.0f, 3.0f},  // Inspecciona la sala
+	{-41.0f, 10.0f, -28.0f, 0.0f, 5.0f, 3.0f},   // Se posicina en las escaleras para el tercer piso
+	{-33.0f, 12.0f, -28.0f, 0.0f, 5.0f, 3.0f},   // Avanza en las escaleras
+	{-33.0f, 12.0f, -28.0f, -90.0f, 5.0f, 3.0f},  // Gira a la izquierda
+	{-32.0f, 13.0f, -31.0f, -90.0f, 5.0f, 3.0f}, // Avanza ligeramente
+	{-41.0f, 20.0f, -31.0f, -180.f, 30.0f, 3.0f}, // sube al tercer piso
+	{-41.0f, 20.0f, -31.0f, -90.0f, 0.0f, 3.0f},  // Avanza para inspeccionar la primera sala del tercer piso
+	{-42.0f, 20.0f, -33.0f, -90.0f, 0.0f, 3.0f},   // Inspecciona la sala
+	{-35.0f, 21.0f, -38.0f, 0.0f, 0.0f, 3.0f},	  // termina de inspeccionar la primera sala 
+	{-35.0f, 21.0f, -38.0f, -90.0f, 0.0f, 3.0f},  // termina de inspeccionar la sala.
+	{-41.0f, 21.0f, -29.f, 45.0f, 0.0f, 3.0f },		
+	{-37.0f, 21.0f, -20.0f, 45.0f, 0.0f, 3.0f},
+	{-37.0f, 21.0f, -20.0f, 0.0f, 0.0f, 3.0f},
+	{-37.0f, 21.0f, -20.0f, 90.0f, 0.0f, 3.0f},
+	{-41.0f, 21.0f, -28.0f, 0.0f, 0.0f, 3.0f },
+	{-34.0f, 23.0f, -28.0f, 0.0f, 10.0f, 3.0f},
+	{-34.0f, 23.0f, -28.0f, -90.0f, 10.0f, 3.0f},  // Escaleras al tercer piso
+	{-32.0f, 23.0f, -31.0f, -90.f, 0.0f, 3.0f},	 // avanza ligeramente	
+	{-40.0f, 31.0f, -32.0f, -180.f, 30.f, 3.0f}, //LLega al ultimo puso
+	{-42.0f, 31.0f, -17.0f, 0.0f, 0.0f, 3.0f}, // Se posiciona en una esquina
+	{-0.3f, 31.0f, -17.0f, 0.0f, 0.0f, 3.0f},
+	{-0.3f, 31.0f, -17.0f, 0.0f, -45.0f, 3.0f},
+	{-0.3f, 31.0f, -17.0f, 0.0f, 0.0f, 3.0f},
+	{-0.3f, 31.0f, -17.0f, -180.0f, 0.0f, 3.0f},
+	{-42.0f, 31.0f, -17.0f, -90.0f, 0.0f, 3.0f},
+	{-42.0f, 32.0f, -42.0f, -90.0f, 0.0f, 3.0f},
+	{-42.0f, 32.0f, -42.0f, 0.0f, 0.0f, 3.0f},
+	{-1.5f, 32.0f, -41.0f, 0.0f, 0.0f, 3.0f},
+	{-1.5f, 32.0f, -41.0f, -45.0f, -45.0f, 3.0f},
+	{-1.5f, 32.0f, -41.0f, 0.0f, -45.0f, 3.0f},
+	{-1.5f, 32.0f, -41.0f, 45.0f, -45.0f, 3.0f}
+
+
+
+
+};
 
 glm::vec3 Light1 = glm::vec3(0);
 
@@ -146,6 +230,83 @@ glm::vec3 Light1 = glm::vec3(0);
 // Deltatime
 GLfloat deltaTime = 0.0f;	// Time between current frame and last frame
 GLfloat lastFrame = 0.0f;  	// Time of last frame
+// Variables para la animación de la cámara
+float posX_camera = 50.0f;
+float posY_camera = 3.0f;
+float posZ_camera = 5.0f;
+float rot_horizontal = 0.0f;
+float rot_vertical = 0.0f;
+bool recorrido_automatico = false;
+
+int indice_frame = 0;
+int total_keyframes = sizeof(frames) / sizeof(frames[0]);
+
+void Reset_Camera_Animation(void) {
+	posX_camera = frames[0].posX_camera;
+	posY_camera = frames[0].posY_camera;
+	posZ_camera = frames[0].posZ_camera;
+	rot_horizontal = frames[0].rot_horizontal;
+	rot_vertical = frames[0].rot_vertical;
+	indice_frame = 0;
+}
+
+// Nuevas variables (deberían ser globales o pasadas como parámetros)
+float tiempo_transcurrido = 0.0f;
+
+void interpolation(GLfloat deltaTime)
+{
+	// Verificar si el recorrido ha terminado ANTES de acceder a frames
+	if (indice_frame >= total_keyframes - 1) {
+		// Asegura que la cámara está en la posición del último keyframe (que ya está hecha por LERP)
+		recorrido_automatico = false;
+		// Reiniciar el contador de tiempo y el índice para el próximo inicio
+		tiempo_transcurrido = 0.0f;
+		indice_frame = 0;
+		// Reset_Camera_Animation(); // Resetea la cámara al primer keyframe
+		recorrido_automatico = false; // Detiene el recorrido automático
+		return; // Termina la función
+	}
+
+	// 1. Obtener los keyframes de inicio y fin
+	FRAME_CAMERA start = frames[indice_frame];
+	FRAME_CAMERA end = frames[indice_frame + 1];
+
+	// 2. Actualizar el tiempo transcurrido para este segmento
+	tiempo_transcurrido += deltaTime;
+
+	// 3. Calcular el factor de progreso (t) [0.0 a 1.0]
+	float t = tiempo_transcurrido / end.time;
+
+	// 4. Asegurarse de que t no exceda 1.0
+	if (t > 1.0f) {
+		t = 1.0f; // Evita el overshoot
+	}
+
+	// 5. Aplicar la Interpolación Lineal (LERP)
+	// LERP(A, B, t) = A + (B - A) * t
+
+	// Interpolación de Posición
+	posX_camera = start.posX_camera + (end.posX_camera - start.posX_camera) * t;
+	posY_camera = start.posY_camera + (end.posY_camera - start.posY_camera) * t;
+	posZ_camera = start.posZ_camera + (end.posZ_camera - start.posZ_camera) * t;
+
+	camera.SetPosition(glm::vec3(posX_camera, posY_camera, posZ_camera));
+
+	// Interpolación de Orientación
+	rot_horizontal = start.rot_horizontal + (end.rot_horizontal - start.rot_horizontal) * t;
+	rot_vertical = start.rot_vertical + (end.rot_vertical - start.rot_vertical) * t;
+
+	camera.SetRotation(rot_horizontal, rot_vertical);
+
+	// 6. Verificar si el movimiento ha terminado
+	if (t >= 1.0f) {
+		// Mueve al siguiente keyframe
+		indice_frame++;
+		tiempo_transcurrido = 0.0f; // Resetear el contador de tiempo
+	}
+}
+
+
 
 
 int main()
@@ -283,6 +444,8 @@ int main()
 		// Check if any events have been activiated (key pressed, mouse moved etc.) and call corresponding response functions
 		glfwPollEvents();
 		DoMovement();
+
+		Animacion_Camara(deltaTime);
 
 		// Clear the colorbuffer
 		glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
@@ -427,7 +590,7 @@ int main()
 
 		// Se dibuja el primer cuadro del museo
 		model = glm::mat4(1);
-		model = glm::translate(model, posicionesCuadros[0]);
+		model = glm::translate(model, glm::vec3(-19.44f, 3.f, -45.0f));
 		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
 		model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.5f));
 		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
@@ -440,7 +603,7 @@ int main()
 
 		// Se dibuja el segundo cuadro del museo
 		model = glm::mat4(1);
-		model = glm::translate(model, posicionesCuadros[1]);
+		model = glm::translate(model, glm::vec3(-18.41f, 3.57f, -15.36f));
 		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
 		model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.5f));
 		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
@@ -453,7 +616,7 @@ int main()
 
 		// Se dibuja el tercer cuadro del museo
 		model = glm::mat4(1);
-		model = glm::translate(model, posicionesCuadros[2]);
+		model = glm::translate(model, glm::vec3(-8.13f, 3.15f, -44.7f));
 		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
 		model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.5f));
 		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
@@ -466,7 +629,7 @@ int main()
 
 		// Se dibuja el cuarto cuadro del museo
 		model = glm::mat4(1);
-		model = glm::translate(model, posicionesCuadros[3]);
+		model = glm::translate(model, glm::vec3(-27.323f, 2.95328f, -44.7903f));
 		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
 		model = glm::scale(model, glm::vec3(0.5f, 0.0f, 0.5f));
 		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
@@ -482,7 +645,7 @@ int main()
 		// Se dibuja el cuadro mas grande del museo
 		model = glm::mat4(1);
 		model = glm::translate(model, posicionesCuadros[4]);
-		model = glm::rotate(model, glm::radians(90.0f), eje_rotacion_cuadro);
+		model = glm::rotate(model, glm::radians(0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		//glEnable(GL_BLEND);//Avtiva la funcionalidad para trabajar el canal alfa
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -615,6 +778,26 @@ void DoMovement()
 	if (keys[GLFW_KEY_J])
 	{
 		pointLightPositions[0].z += 0.01f;
+	}
+	// Se posiciona la camara en la entrada del museo al presionar la tecla 1
+	if (keys[GLFW_KEY_1]) {
+		camera.TeleportAndReset(glm::vec3(50.0f, 3.0f, 5.0f));
+	}
+	if (keys[GLFW_KEY_2]) {
+		if (recorrido_automatico == false) {
+			recorrido_automatico = true;
+			printf("Recorrido automatico activado\n");
+		}
+	}
+	if (keys[GLFW_KEY_3]) {
+		if (recorrido_automatico == true) {
+			recorrido_automatico = false;
+			printf("Recorrido automatico desactivado\n");
+		}
+	}
+	if (keys[GLFW_KEY_4])
+	{
+		camera.SetPosition(glm::vec3(13.0f, 10.0f, -39.0f));
 	}
 
 }
@@ -1159,4 +1342,12 @@ void AnimarAvionInfinito(Shader& shader, GLint modelLoc, Model& modeloAvion, glm
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	modeloAvion.Draw(shader);
+}
+
+void Animacion_Camara(GLfloat deltaTime) {
+
+	if (recorrido_automatico == true) {
+		//Implementar aqui la animacion de la camara
+		interpolation(deltaTime);
+	}
 }

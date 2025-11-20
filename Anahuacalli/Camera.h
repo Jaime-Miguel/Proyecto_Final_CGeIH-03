@@ -115,6 +115,33 @@ public:
 
 	}
 
+	// Funcion que permite cambiar la posición de la cámara
+	void SetPosition(const glm::vec3& newPosition) {
+		this -> position = newPosition;
+		this -> updateCameraVectors();
+	}
+
+	// Función que teletransporta la cámara a una nueva posición y resetea su orientación
+	void TeleportAndReset(const glm::vec3& newPosition, GLfloat newYaw = YAW, GLfloat newPitch = PITCH)
+	{
+		// 1. Asigna la nueva Posición
+		this->position = newPosition;
+
+		// 2. Resetea los ángulos a los valores por defecto
+		this->yaw = newYaw;
+		this->pitch = newPitch;
+
+		// 3. Recalcula los vectores Front, Up y Right para que apunten en la dirección correcta
+		this->updateCameraVectors();
+	}
+
+	void SetRotation(GLfloat newYaw, GLfloat newPitch)
+	{
+		this->yaw = newYaw;
+		this->pitch = newPitch;
+		this->updateCameraVectors();
+	}
+
 	GLfloat GetZoom()
 	{
 		return this->zoom;
