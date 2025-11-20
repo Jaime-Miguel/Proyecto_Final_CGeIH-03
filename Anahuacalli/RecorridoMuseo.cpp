@@ -28,7 +28,6 @@
 void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void MouseCallback(GLFWwindow* window, double xPos, double yPos);
 void DoMovement();
-GLuint LoadTextureFromFile(const char* path);
 // Funciones creadas
 //Dibuja las ventanas de diferentes edificios.
 void Dibujar_Vidrios(Shader shader, Model* vidrios, GLint modelLoc); 
@@ -47,6 +46,8 @@ void AnimarGato(Shader& shader, GLint modelLoc, Model& body, Model& head,
 	glm::vec3 posicion, float escala, float tiempo);
 // Animacion de helicoptero
 void AnimarHelicoptero(Shader& shader, GLint modelLoc, Model& cuerpo, Model& helice, glm::vec3 pos, float escala, float tiempo);
+// Animacion de avion volando en forma infinito
+void AnimarAvionInfinito(Shader& shader, GLint modelLoc, Model& modeloAvion, glm::vec3 centro, float radio, float escala, float tiempo);
 // Dibuja un objeto compuesto por dos partes (ej. tronco y hojas)
 void DibujarArboles(Shader& shader, GLint modelLoc, Model& tronco, Model& hojas, glm::vec3 posicion, float escala);
 // Dibuja un solo arbol
@@ -217,6 +218,7 @@ int main()
 	Model flores((char*)"Models/Flores.obj");
 	Model tree((char*)"Models/aviarioarbol.obj");
 	Model treeL((char*)"Models/hojasaviario.obj");
+	Model diane((char*)"Models/DIANE1.obj");
 	//Modelos animados
 	// Pajaro
 	Model birdB((char*)"Models/pajaro1body.obj");
@@ -356,29 +358,22 @@ int main()
 		glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
-		/*model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-21.0f, 0.0f, -83.0f));
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		heliCabin.Draw(lightingShader);
-		modelTemp = model;
-		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelTemp));
-		heliProp.Draw(lightingShader);*/
-
-
 		glm::vec3 centroPajaro = glm::vec3(20.0f, 2.0f, -10.0f);
 		float radio = 2.0f;
 		glm::vec3 posicionQ = glm::vec3(17.0f, -3.0f, -62.0f);
 		glm::vec3 girlPos = glm::vec3(-4.0f, 7.5f, -30.0f);
 		glm::vec3 posCaballo = glm::vec3(19.0f, 0.0f, -80.0f);
 		glm::vec3 posGato = glm::vec3(15.0f, 0.0f, -15.0f);
-		glm::vec3 posHeli = glm::vec3(-21.0f, 10.0f, -83.0f);
+		glm::vec3 posHeli = glm::vec3(53.0f, 10.0f, -27.0f);
+		glm::vec3 centroVuelo = glm::vec3(20.0f, 15.0f, -82.0f);
+		float amplitudVuelo = 30.0f;
 		AnimarPajaro(lightingShader, modelLoc, birdB, birdWR, birdWL, currentFrame, centroPajaro, radio);
 		AnimarQuetzal(lightingShader, modelLoc, quetzalB, quetzalH, quetzalT, posicionQ, true,currentFrame);
 		AnimarPersonaje(lightingShader, modelLoc, girlL, girlB, girlPos, 0.6f, currentFrame);
 		AnimarCaballo(lightingShader, modelLoc, horseB, horseF, posCaballo, 2.0f, currentFrame);
 		AnimarGato(lightingShader, modelLoc, catB, catH, catFL, catFR, catBL, catBR, posGato, 4.0f, currentFrame);
 		AnimarHelicoptero(lightingShader, modelLoc, heliCabin, heliProp, posHeli, 1.0f, currentFrame);
-
+		AnimarAvionInfinito(lightingShader, modelLoc, plane, centroVuelo, amplitudVuelo, 0.08f, currentFrame);
 
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -30.0f), 0.5);
 		DibujarArboles(lightingShader, modelLoc, pinoB, pinoL, glm::vec3(40.0f, 0.0f, -40.0f), 0.5);
@@ -415,10 +410,6 @@ int main()
 		DibujarArbol(lightingShader, modelLoc, tree, treeL, glm::vec3(30.0f, -5.0f, -70.0f),0.0f);
 		DibujarArbol(lightingShader, modelLoc, tree, treeL, glm::vec3(20.0f, -5.0f, -95.0f), 90.0f);
 
-		
-		
-
-
 		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(30.0f, 0.5f, -16.0f), 0.5f, 90.0f);
 		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(15.0f, 0.5f, -4.0f), 0.5f, 90.0f);
 		DibujarFlor(lightingShader, modelLoc, flores, glm::vec3(-3.0f, 0.5f, -4.0f), 0.5f, 90.0f);
@@ -430,9 +421,9 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		MuseoAnahuacalli.Draw(lightingShader);
+		Dibujar_Vidrios(lightingShader, vidrios, modelLoc);
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
-
 
 		// Se dibuja el primer cuadro del museo
 		model = glm::mat4(1);
@@ -486,7 +477,7 @@ int main()
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
 		glBindVertexArray(0);
 
-		Dibujar_Vidrios(lightingShader, vidrios, modelLoc);
+		
 
 		// Se dibuja el cuadro mas grande del museo
 		model = glm::mat4(1);
@@ -498,6 +489,14 @@ int main()
 		glUniform1i(glGetUniformLocation(lightingShader.Program, "transparency"), 0);
 		Mural01.Draw(lightingShader);
 		//glDisable(GL_BLEND);  //Desactiva el canal alfa 
+		// Se dibuja la estatua en el primer piso del museo
+		model = glm::mat4(1);
+		model = glm::translate(model, glm::vec3(-42.0f, 7.4f, -18.0f));
+		model = glm::scale(model, glm::vec3(0.5f));
+		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+		diane.Draw(lightingShader);
+		
+		
 		glBindVertexArray(0);
 
 
@@ -1104,4 +1103,60 @@ void AnimarHelicoptero(Shader& shader, GLint modelLoc, Model& cuerpo, Model& hel
 
 	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(modelH));
 	helice.Draw(shader);
+}
+
+void AnimarAvionInfinito(Shader& shader, GLint modelLoc, Model& modeloAvion, glm::vec3 centro, float radio, float escala, float tiempo)
+{
+	// --- CONFIGURACIÓN ---
+	float velocidad = 1.0f; // Velocidad de recorrido
+
+	// 1. CÁLCULO DE LA POSICIÓN (TRAYECTORIA EN 8)
+	// Ecuación paramétrica de la Lemniscata (Figura 8)
+	// X se mueve con cos(t), Z se mueve con sin(2*t) para hacer el cruce
+	float t = tiempo * velocidad;
+
+	float x = centro.x + (radio * cos(t));
+	float z = centro.z + (radio * sin(2.0f * t) / 2.0f); // Dividimos entre 2 para que el 8 sea proporcional
+
+	// Agregamos una leve variación en Y para que no vuele plano
+	float y = centro.y + (sin(t * 2.0f) * 1.0f);
+
+	// 2. CÁLCULO DE LA ORIENTACIÓN (YAW - Rumbo)
+	// Para que el avión mire al frente, necesitamos la derivada (velocidad) de la posición
+	// Derivada de cos(t) es -sin(t)
+	// Derivada de sin(2t) es 2*cos(2t)
+	float dx = -sin(t);
+	float dz = cos(2.0f * t);
+
+	// atan2 nos da el ángulo en radianes desde el vector (0,0) al vector (dx,dz)
+	float anguloY = atan2(dx, dz);
+	// Convertimos a grados
+	float gradosY = glm::degrees(anguloY);
+
+	// 3. CÁLCULO DEL ALABEO (ROLL - Inclinación)
+	// El avión debe inclinarse hacia adentro de la curva.
+	// Usamos la curvatura o simplemente sincronizamos con el giro.
+	// En un 8, el giro cambia de izquierda a derecha, así que cos(t) funciona bien para simular esto.
+	float anguloRoll = cos(t) * 45.0f; // 45 grados de inclinación máxima
+
+	// --- CONSTRUCCIÓN DE LA MATRIZ ---
+	glm::mat4 model = glm::mat4(1.0f);
+
+	// A. Posición
+	model = glm::translate(model, glm::vec3(x, y, z));
+
+	// B. Orientación (Rumbo/Yaw)
+	// Sumamos 90, 180 o 270 si el modelo viene rotado por defecto.
+	// Prueba sumando +180.0f o +90.0f si vuela de lado o de reversa.
+	model = glm::rotate(model, glm::radians(gradosY), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	// C. Inclinación (Roll)
+	// Importante: Rotamos en el eje Z (o X) local para el alabeo
+	model = glm::rotate(model, glm::radians(anguloRoll), glm::vec3(0.0f, 0.0f, 1.0f)); // Eje X si el avión apunta en Z, o Z si apunta en X
+	// NOTA: Si el avión gira raro (como un taladro), cambia este eje a (0,0,1)
+
+	model = glm::scale(model, glm::vec3(escala));
+
+	glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+	modeloAvion.Draw(shader);
 }
